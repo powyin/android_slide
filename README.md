@@ -14,7 +14,7 @@ dependencies {
 
 ###  UI
 
-|刷新（可自定义）|下拉加载获取新数据(可自定义)|上拉加载数据全部获得(可自定义)|
+|多项Item|少量Item|Swtch开关|
 |---|---|----
 |![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/show_1.gif)|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/show_1.gif)|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/show_1.gif)|
 
