@@ -16,7 +16,7 @@ dependencies {
 
 |刷新（可自定义）|下拉加载获取新数据(可自定义)|上拉加载数据全部获得(可自定义)|
 |---|---|----
-|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_pre.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_2.gif)|![github](https://github.com/powyin/nest-scroll/blob/master/app/src/main/res/raw/refresh_load_1.gif)|
+|![github](https://github.com/powyin/slide/tree/master/app/src/main/res/raw/show_1.gif)|![github](https://github.com/powyin/slide/tree/master/app/src/main/res/raw/show_1.gif)|![github](https://github.com/powyin/slide/tree/master/app/src/main/res/raw/show_1.gif)|
 
 
 
