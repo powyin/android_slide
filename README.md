@@ -28,8 +28,12 @@ dependencies {
 
 
 
-### 注意
+### 优点
 ```
+  SlideSwitch切换条自动滚动中央位置
+  SlideSwitch切换条可以过度滚动；
+  SlideSwitch切换条可以设置固定最大条目数； 多于此条目数 则滚动； 少于次条目数 则平分空间
+  
   
   
   
