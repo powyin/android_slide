@@ -10,12 +10,14 @@
         android:gravity="center"
         android:padding="10dp" />
 
-    <ImageView
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
-        android:src="@drawable/be"
-
+        android:gravity="center"
+        android:text="ViewPage"
+        android:background="#dedede"
         />
 
 

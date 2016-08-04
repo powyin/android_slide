@@ -1,153 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <com.powyin.slide.widget.SlideSwitch
-        android:id="@+id/test_switch"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:pow_max_item="3"
-        app:pow_show_over_scroll="true"
-        >
-
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:gravity="center">
         <TextView
-            android:background="#6f00ff00"
+            android:id="@+id/click_to_single"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:minWidth="70dp"
-            android:text="音乐"
-            android:gravity="center" />
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:background="@drawable/button_bg"
+            android:text="SimpleSlideSwitch"
+            android:onClick="onClick"/>
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="5dp" />
 
         <TextView
-            android:background="#7700bbff"
+            android:id="@+id/click_to_multiple"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:minWidth="70dp"
-            android:text="视频"
-            android:gravity="center"/>
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:background="@drawable/button_bg"
+            android:text="SimpleSlideSwitchMultiple"
+            android:onClick="onClick"/>
 
-        <TextView
-            android:background="#6c8c00ff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:minWidth="70dp"
-            android:text="教育"
-            android:gravity="center"/>
+    </LinearLayout>
 
-        <TextView
-            android:background="#6c00ff51"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:minWidth="70dp"
-            android:text="娱乐"
-            android:gravity="center" />
-
-        <TextView
-            android:background="#6c0026ff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:minWidth="70dp"
-            android:text="international"
-            android:gravity="center" />
-
-        <TextView
-            android:background="#6cff006f"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:minWidth="70dp"
-            android:text="笑话"
-            android:gravity="center"  />
-
-        <TextView
-            android:background="#6c008cff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:minWidth="70dp"
-            android:text="谐星"
-            android:gravity="center"  />
-
-
-
-
-    </com.powyin.slide.widget.SlideSwitch>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2px" />
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/view_pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-</LinearLayout>
-
-<!--<TextView-->
-<!--android:background="#6cb700ff"-->
-<!--android:layout_width="100dp"-->
-<!--android:layout_height="100dp" />-->
-
-<!--<TextView-->
-<!--android:background="#6c2fff00"-->
-<!--android:layout_width="100dp"-->
-<!--android:layout_height="100dp" />-->
-
-
-<!--<TextView-->
-<!--android:background="#6ceeff00"-->
-<!--android:layout_width="100dp"-->
-<!--android:layout_height="100dp" />-->
-
-<!--<TextView-->
-<!--android:background="#6cff8800"-->
-<!--android:layout_width="100dp"-->
-<!--android:layout_height="100dp" />-->
-
-<!--<TextView-->
-<!--android:background="#6cff2600"-->
-<!--android:layout_width="100dp"-->
-<!--android:layout_height="100dp" />-->
-
-<!--<com.powyin.slide.widget.SlideSwitch-->
-<!--android:layout_width="match_parent"-->
-<!--android:layout_height="70dp">-->
-
-<!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="2222"-->
-    <!--android:textSize="14sp"-->
-    <!--android:padding="5dp"-->
-
-    <!--/>-->
-
-<!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="2222"-->
-    <!--android:textSize="14sp"-->
-    <!--android:padding="5dp"-->
-
-    <!--/>-->
-
-<!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="2222"-->
-    <!--android:textSize="14sp"-->
-    <!--android:padding="5dp"-->
-
-    <!--/>-->
-<!--</com.powyin.slide.widget.SlideSwitch>-->
+</FrameLayout>

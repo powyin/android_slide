@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <com.powyin.slide.widget.SlideSwitch
+        android:id="@+id/test_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:pow_max_item="3"
+        app:pow_show_over_scroll="true"
+        >
+
+        <TextView
+            android:background="#6f00ff00"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:minWidth="70dp"
+            android:text="音乐"
+            android:gravity="center" />
+
+        <TextView
+            android:background="#7700bbff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:minWidth="70dp"
+            android:text="视频"
+            android:gravity="center"/>
+
+        <TextView
+            android:background="#6c8c00ff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:minWidth="70dp"
+            android:text="教育"
+            android:gravity="center"/>
+
+        <TextView
+            android:background="#6c00ff51"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:minWidth="70dp"
+            android:text="娱乐"
+            android:gravity="center" />
+
+        <TextView
+            android:background="#6c0026ff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:minWidth="70dp"
+            android:text="international"
+            android:gravity="center" />
+
+        <TextView
+            android:background="#6cff006f"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:minWidth="70dp"
+            android:text="笑话"
+            android:gravity="center"  />
+
+        <TextView
+            android:background="#6c008cff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:minWidth="70dp"
+            android:text="谐星"
+            android:gravity="center"  />
+
+
+
+
+    </com.powyin.slide.widget.SlideSwitch>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2px" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>
+
