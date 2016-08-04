@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
     <declare-styleable name="SlideSwitch">
-        <attr name="checked_drawable" format="reference"/>
-        <attr name="checked_select" format="integer"/>
-        <attr name="checked_always_select" format="boolean"/>
+        <attr name="pow_checked_drawable" format="reference"/>
+        <attr name="pow_checked_bac" format="reference"/>
+        <attr name="pow_checked_hei" format="integer"/>
+        <attr name="pow_max_item" format="integer"/>
+        <attr name="pow_show_over_scroll" format="boolean"/>
     </declare-styleable>
-
 
 </resources>
