@@ -44,14 +44,14 @@ public class SlideSwitch extends ViewGroup {
     private ValueAnimator valueAnimator;
     private int mMaxWid;
     private float mSelectIndex = 0;
-    private Drawable mSelectDrawable;                     //选择区域显示
-    private Drawable mSelectDrawableBac;                  //选择区域背景
-    private int mSelectHei;                               //选择区域高度
-    private int mSelectMaxItem;                           //选择区域平分最大宽度
-    private boolean mSelectShowOverScroll;                //选择区域是否显示过度拉升
-    private Rect mSelectDrawableRect = new Rect();        //选择区域显示 边界
-    private Rect mSelectDrawableRectBac = new Rect();     //选择区域背景 边界
-    private Path mSelectDrawablePath = new Path();        //选择区域背景 绘制边界
+    private Drawable mSelectDrawable;                                     //选择区域显示
+    private Drawable mSelectDrawableBac;                                  //选择区域背景
+    private int mSelectHei;                                               //选择区域高度
+    private int mSelectMaxItem;                                           //选择区域平分最大宽度
+    private boolean mSelectShowOverScroll;                                //选择区域是否显示过度拉升
+    private Rect mSelectDrawableRect = new Rect();                        //选择区域显示 边界
+    private Rect mSelectDrawableRectBac = new Rect();                     //选择区域背景 边界
+    private Path mSelectDrawablePath = new Path();                        //选择区域背景 绘制边界
     private List<View> mMatchParentChildren = new ArrayList<>();
     private OnPageChangeListener mOnPageChangeListener;
 
@@ -81,7 +81,6 @@ public class SlideSwitch extends ViewGroup {
         a.recycle();
 
         setScrollingCacheEnabled(true);
-        setClickable(true);
         mScroller = new Scroller(context);
         ViewConfiguration configuration = ViewConfiguration.get(context);
         mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
@@ -224,7 +223,6 @@ public class SlideSwitch extends ViewGroup {
 
             if (mSelectDrawable != null) {
                 mSelectDrawable.setBounds(mSelectDrawableRect);                                                                //画这个view的背景
-
                 mSelectDrawable.draw(canvas);
             }
             canvas.restore();
@@ -367,11 +365,11 @@ public class SlideSwitch extends ViewGroup {
                 }
             case MotionEvent.ACTION_CANCEL:
                 if (mIsBeingDragged) {
-                    startFlay();
-                    mActivePointerId = INVALID_POINTER;
+                    startFly();
                     ViewCompat.postInvalidateOnAnimation(this);
-                    mVelocityTracker.clear();
                 }
+                mActivePointerId = INVALID_POINTER;
+                mVelocityTracker.clear();
                 mIsBeingDragged = false;
                 break;
             case MotionEventCompat.ACTION_POINTER_DOWN: {
@@ -486,7 +484,7 @@ public class SlideSwitch extends ViewGroup {
         }
     }
 
-    private void startFlay() {
+    private void startFly() {
         mVelocityTracker.computeCurrentVelocity(500, mMaximumVelocity);
         int initialVelocity = (int) VelocityTrackerCompat.getXVelocity(
                 mVelocityTracker, mActivePointerId);

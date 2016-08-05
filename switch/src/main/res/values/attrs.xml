@@ -9,4 +9,17 @@
         <attr name="pow_show_over_scroll" format="boolean"/>
     </declare-styleable>
 
+    <declare-styleable name="PowSwitch">
+        <attr name="pow_switch_icon_on" format="reference"/>
+        <attr name="pow_switch_icon_off" format="reference"/>
+        <attr name="pow_switch_bac_on" format="reference"/>
+        <attr name="pow_switch_bac_off" format="reference"/>
+        <attr name="pow_switch_padding" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="BannerSwitch">
+        <attr name="pow_banner_switch_period" format="integer"/>
+        <attr name="pow_banner_switch_animation_period" format="integer"/>
+    </declare-styleable>
+
 </resources>

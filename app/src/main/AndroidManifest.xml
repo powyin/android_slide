@@ -18,6 +18,8 @@
 
         <activity android:name=".SimpleSlideSwitch"/>
         <activity android:name=".SimpleSlideSwitchMultiple"/>
+        <activity android:name=".SimpleBannerSwitch"/>
+        <activity android:name=".SimplePowSwitch"/>
     </application>
 
 </manifest>

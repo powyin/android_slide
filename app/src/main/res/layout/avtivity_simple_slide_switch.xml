@@ -21,7 +21,10 @@
             android:padding="8dp"
             android:minWidth="70dp"
             android:text="音乐"
-            android:gravity="center" />
+            android:gravity="center"
+            android:clickable="true"
+            android:onClick="onClick"
+            />
 
         <TextView
             android:background="#7700bbff"
@@ -30,7 +33,9 @@
             android:padding="8dp"
             android:minWidth="70dp"
             android:text="视频"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:clickable="true"
+            android:onClick="onClick"/>
 
         <TextView
             android:background="#6c8c00ff"
@@ -39,7 +44,9 @@
             android:padding="8dp"
             android:minWidth="70dp"
             android:text="教育"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:clickable="true"
+            android:onClick="onClick"/>
 
         <TextView
             android:background="#6c00ff51"
@@ -48,7 +55,9 @@
             android:padding="8dp"
             android:minWidth="70dp"
             android:text="娱乐"
-            android:gravity="center" />
+            android:gravity="center"
+            android:clickable="true"
+            android:onClick="onClick"/>
 
 
 

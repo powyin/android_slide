@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    >
+
+    <com.powyin.slide.widget.PowSwitch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        />
+
+    <Space
+        android:layout_width="10dp"
+        android:layout_height="10dp" />
+
+    <com.powyin.slide.widget.PowSwitch
+        android:layout_width="70dp"
+        android:layout_height="30dp"
+        android:background="#f4f4f4"
+        android:padding="5dp"
+        />
+
+    <Space
+        android:layout_width="10dp"
+        android:layout_height="10dp" />
+
+    <com.powyin.slide.widget.PowSwitch
+        android:layout_width="70dp"
+        android:layout_height="30dp"
+        android:padding="5dp"/>
+
+
+
+</LinearLayout>

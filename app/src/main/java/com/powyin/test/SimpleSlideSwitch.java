@@ -35,7 +35,7 @@ public class SimpleSlideSwitch extends AppCompatActivity {
 
             @Override
             public void onPageScroll(float mScroll) {
-                System.out.println("-------zzz"+mScroll);
+            //    System.out.println("-------zzz"+mScroll);
             }
         });
 

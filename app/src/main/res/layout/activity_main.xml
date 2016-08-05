@@ -10,7 +10,7 @@
         android:layout_gravity="center"
         android:gravity="center">
         <TextView
-            android:id="@+id/click_to_single"
+            android:id="@+id/click_to_slide_switch_single"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="20dp"
@@ -18,14 +18,14 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:background="@drawable/button_bg"
-            android:text="SimpleSlideSwitch"
+            android:text="SlideSwitch"
             android:onClick="onClick"/>
         <Space
             android:layout_width="1dp"
             android:layout_height="5dp" />
 
         <TextView
-            android:id="@+id/click_to_multiple"
+            android:id="@+id/click_to_slide_switch_multiple"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="20dp"
@@ -33,8 +33,40 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:background="@drawable/button_bg"
-            android:text="SimpleSlideSwitchMultiple"
+            android:text="SlideSwitchMultiple"
             android:onClick="onClick"/>
+
+        <Space
+        android:layout_width="1dp"
+        android:layout_height="5dp" />
+
+        <TextView
+            android:id="@+id/click_to_banner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:background="@drawable/button_bg"
+            android:text="BannerSwitch"
+            android:onClick="onClick" />
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="5dp" />
+
+        <TextView
+            android:id="@+id/click_to_pow_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:background="@drawable/button_bg"
+            android:text="PowSwitch"
+            android:onClick="onClick" />
 
     </LinearLayout>
 
