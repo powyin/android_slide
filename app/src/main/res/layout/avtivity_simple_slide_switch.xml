@@ -10,7 +10,7 @@
         android:id="@+id/test_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:pow_max_item="5"
+        app:pow_fixed_item="5"
         app:pow_show_over_scroll="false"
         >
 

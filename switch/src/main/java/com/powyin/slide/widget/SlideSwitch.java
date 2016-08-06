@@ -1,5 +1,6 @@
 package com.powyin.slide.widget;
 
+import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -76,7 +77,7 @@ public class SlideSwitch extends ViewGroup {
             mSelectDrawableBac = context.getResources().getDrawable(R.drawable.powyin_switch_slide_switch_select_bac);
         }
         mSelectHei = a.getInt(R.styleable.SlideSwitch_pow_checked_hei, 8);
-        mSelectMaxItem = a.getInt(R.styleable.SlideSwitch_pow_max_item, 4);
+        mSelectMaxItem = a.getInt(R.styleable.SlideSwitch_pow_fixed_item, -1);
         mSelectShowOverScroll = a.getBoolean(R.styleable.SlideSwitch_pow_show_over_scroll, false);
         a.recycle();
 
@@ -96,7 +97,7 @@ public class SlideSwitch extends ViewGroup {
         mMatchParentChildren.clear();
         int maxHeight = 0;
         int maxWidth = 0;
-        if (count > mSelectMaxItem) {
+        if (mSelectMaxItem<=0) {
             for (int i = 0; i < count; i++) {
                 final View child = getChildAt(i);
                 measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, mSelectHei);
@@ -136,8 +137,8 @@ public class SlideSwitch extends ViewGroup {
 
         } else {
             int widthMeasure = MeasureSpec.getSize(widthMeasureSpec);
-            int pace = count > 0 ? (int) (1f / (count) * (widthMeasure - getPaddingLeft() - getPaddingRight())) : 0;
-            int speWidthMeasure = count > 0 ? MeasureSpec.makeMeasureSpec(pace, MeasureSpec.EXACTLY) : 0;
+            float pace = (1f / (mSelectMaxItem) * (widthMeasure - getPaddingLeft() - getPaddingRight())) ;
+            int speWidthMeasure =  MeasureSpec.makeMeasureSpec((int)pace, MeasureSpec.EXACTLY) ;
             int usedHei = getPaddingTop() + getPaddingBottom() + mSelectHei;
             for (int i = 0; i < count; i++) {
                 final View child = getChildAt(i);
@@ -177,7 +178,7 @@ public class SlideSwitch extends ViewGroup {
         int childTop = getPaddingTop();
         int childLeft = getPaddingLeft();
         final int count = getChildCount();
-        if (count > mSelectMaxItem) {
+        if (mSelectMaxItem<=0) {
             for (int i = 0; i < count; i++) {
                 View child = getChildAt(i);
                 int childWidth = child.getMeasuredWidth();
@@ -191,21 +192,16 @@ public class SlideSwitch extends ViewGroup {
             }
             mMaxWid = childLeft - getPaddingLeft();
         } else {
-            int pace = count > 0 ? (int) (1f / (count) * (r - l - getPaddingLeft() - getPaddingRight())) : 0;
+            float pace = 1f / (mSelectMaxItem) * (r - l - getPaddingLeft() - getPaddingRight());
             int paddingLeft = getPaddingLeft();
             for (int i = 0; i < count; i++) {
                 View child = getChildAt(i);
                 int childHeight = child.getMeasuredHeight();
                 LayoutParams lp =
                         (LayoutParams) child.getLayoutParams();
-                if (i != count - 1) {                                                                                                                //防止边界留空
-                    child.layout(paddingLeft + i * pace + lp.leftMargin, childTop, paddingLeft + i * pace + pace - lp.rightMargin, childHeight + childTop);
-                } else {
-                    child.layout(paddingLeft + i * pace + lp.leftMargin, childTop, r - l - getPaddingLeft() - getPaddingRight(), childHeight + childTop);
-                }
-
+                child.layout(paddingLeft + (int)(i * pace) + lp.leftMargin, childTop, paddingLeft + (int)((i+1) * pace) - lp.rightMargin, childHeight + childTop);
             }
-            mMaxWid = r - l - getPaddingLeft() - getPaddingRight();
+            mMaxWid =Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), (int)(pace*(count)));
         }
         calculationRect(true);
     }
@@ -503,24 +499,36 @@ public class SlideSwitch extends ViewGroup {
 
     private void preformItemSelectAnimationClick(int targetIndex) {
         if (targetIndex < 0 || targetIndex >= getChildCount()) return;
-        final int startScrollX = getScrollX();
-        View targetView = getChildAt((targetIndex));
-        int center = targetView.getLeft() / 2 + targetView.getRight() / 2;
-        int temTargetX = -getWidth() / 2 - getPaddingLeft() / 2 + getPaddingRight() / 2 + center;
-
-        final int endScrollX = Math.min(Math.max(temTargetX, 0), mMaxWid + getPaddingLeft() + getPaddingRight() - getWidth());
 
         if (targetIndex != mSelectIndex && Math.abs(targetIndex - mSelectIndex) > 0.1f) {
             if (valueAnimator != null) valueAnimator.cancel();
-            valueAnimator = ValueAnimator.ofFloat(mSelectIndex, targetIndex);
-            final int animationTime = 150 + (int) (250 * Math.abs((targetIndex - mSelectIndex) * 1f / getChildCount()));
-            valueAnimator.setDuration(animationTime);
+
+            View targetView = getChildAt((targetIndex));
+            int center = targetView.getLeft() / 2 + targetView.getRight() / 2;
+            int temTargetX = -getWidth() / 2 - getPaddingLeft() / 2 + getPaddingRight() / 2 + center;
+
+            int startScrollX = getScrollX();
+            int endScrollX = Math.min(Math.max(temTargetX, 0), mMaxWid + getPaddingLeft() + getPaddingRight() - getWidth());
+
+            PropertyValuesHolder valuesHolderScrollX = PropertyValuesHolder.ofInt("scrollX",startScrollX,endScrollX);
+            PropertyValuesHolder valuesHolderSelectIndex = PropertyValuesHolder.ofFloat("scrollRadio",mSelectIndex,targetIndex);
+
+            valueAnimator = ValueAnimator.ofPropertyValuesHolder(valuesHolderScrollX, valuesHolderSelectIndex);
+            valueAnimator.setDuration(150 + (int) (250 * Math.abs((targetIndex - mSelectIndex) * 1f / getChildCount())));
             valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
+
                     int left = mSelectDrawableRect.left;
                     int right = mSelectDrawableRect.right;
-                    mSelectIndex = (float) animation.getAnimatedValue();
+
+                    int mScrollX = (int)  animation.getAnimatedValue("scrollX");
+                    mSelectIndex = (float) animation.getAnimatedValue("scrollRadio");
+
+                    if (getScrollX() != mScrollX) {
+                        scrollTo(mScrollX, 0);
+                    }
+
                     calculationRect(false);
                     if (left != mSelectDrawableRect.left || right != mSelectDrawableRect.right) {
                         if (mOnPageChangeListener != null) {
@@ -529,11 +537,6 @@ public class SlideSwitch extends ViewGroup {
                         ViewCompat.postInvalidateOnAnimation(SlideSwitch.this);
                     }
 
-                    float currentRadio = animation.getCurrentPlayTime() * 1f / animation.getDuration();
-                    int targetScrollX = (int) ((endScrollX - startScrollX) * currentRadio + startScrollX);
-                    if (getScrollX() != targetScrollX) {
-                        scrollTo(targetScrollX, 0);
-                    }
                 }
             });
             valueAnimator.start();

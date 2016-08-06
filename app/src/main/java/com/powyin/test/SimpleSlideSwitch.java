@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
 import com.powyin.slide.widget.SlideSwitch;
 
@@ -43,6 +44,9 @@ public class SimpleSlideSwitch extends AppCompatActivity {
 
     }
 
+    public void onClick(View view){
+
+    }
 
 
 }

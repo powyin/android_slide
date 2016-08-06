@@ -4,9 +4,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewConfigurationCompat;
@@ -39,31 +37,30 @@ public class BannerSwitch extends ViewGroup {
 
     private ValueAnimator mSwitchAnimator;
     private AnimationRun autoProgress;
-    private int mSwitchPagePeriod ;
-    private int mSwitchAnimationPeriod ;
+    private int mSwitchPagePeriod;
+    private int mSwitchAnimationPeriod;
     private boolean mIsTouched = false;
-    private long mTouchedEndTime;
+    private long mSwitchEndTime;
 
     // 横幅滚动轴；
     float mSelectIndex;
 
-    private class AnimationRun implements Runnable{
+    private class AnimationRun implements Runnable {
         boolean isCancel;
+
         @Override
         public void run() {
-            if(isCancel) return;
-            long pre = (System.currentTimeMillis()-mTouchedEndTime);
-            if(getVisibility() == VISIBLE && !mIsTouched && pre>=mSwitchPagePeriod/3) {
+            if (isCancel) return;
+            long pre = (System.currentTimeMillis() - mSwitchEndTime);
+            if (getVisibility() == VISIBLE && !mIsTouched && pre >= mSwitchPagePeriod / 3) {
                 startFly(true);
             }
 
-            if(pre>=mSwitchPagePeriod/3){
-                postDelayed(this,mSwitchPagePeriod);
-            }else {
-                postDelayed(this,mSwitchPagePeriod/10);
+            if (pre >= mSwitchPagePeriod / 3) {
+                postDelayed(this, mSwitchPagePeriod);
+            } else {
+                postDelayed(this, mSwitchPagePeriod / 10);
             }
-
-
         }
     }
 
@@ -78,14 +75,14 @@ public class BannerSwitch extends ViewGroup {
     public BannerSwitch(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BannerSwitch);
-        mSwitchPagePeriod = a.getInt(R.styleable.BannerSwitch_pow_banner_switch_period,2450);
+        mSwitchPagePeriod = a.getInt(R.styleable.BannerSwitch_pow_banner_switch_period, 2450);
 
-        mSwitchPagePeriod = Math.max(1500,mSwitchPagePeriod);
-        mSwitchPagePeriod = Math.min(10000,mSwitchPagePeriod);
+        mSwitchPagePeriod = Math.max(1500, mSwitchPagePeriod);
+        mSwitchPagePeriod = Math.min(10000, mSwitchPagePeriod);
 
-        mSwitchAnimationPeriod = a.getInt(R.styleable.BannerSwitch_pow_banner_switch_animation_period,450);
-        mSwitchAnimationPeriod = Math.max(100,mSwitchAnimationPeriod);
-        mSwitchAnimationPeriod = Math.max(1000,mSwitchAnimationPeriod);
+        mSwitchAnimationPeriod = a.getInt(R.styleable.BannerSwitch_pow_banner_switch_animation_period, 450);
+        mSwitchAnimationPeriod = Math.max(100, mSwitchAnimationPeriod);
+        mSwitchAnimationPeriod = Math.max(1000, mSwitchAnimationPeriod);
 
         a.recycle();
         setScrollingCacheEnabled();
@@ -97,7 +94,7 @@ public class BannerSwitch extends ViewGroup {
         int count = getChildCount();
         int maxHeight = 0;
         int speWidthMeasure = count > 0 ? MeasureSpec.makeMeasureSpec(
-                Math.max(MeasureSpec.getSize(widthMeasureSpec) -getPaddingLeft() - getPaddingRight(), 0), MeasureSpec.EXACTLY) : 0;
+                Math.max(MeasureSpec.getSize(widthMeasureSpec) - getPaddingLeft() - getPaddingRight(), 0), MeasureSpec.EXACTLY) : 0;
         int usedHei = getPaddingTop() + getPaddingBottom();
         for (int i = 0; i < count; i++) {
             final View child = getChildAt(i);
@@ -115,7 +112,7 @@ public class BannerSwitch extends ViewGroup {
 
         // 设置测量大小
         setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec),
-                resolveSizeAndState(maxHeight , heightMeasureSpec, 0));
+                resolveSizeAndState(maxHeight, heightMeasureSpec, 0));
 
         for (int i = 0; i < getChildCount(); i++) {
             final View child = getChildAt(i);
@@ -136,7 +133,7 @@ public class BannerSwitch extends ViewGroup {
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
             int childHeight = child.getMeasuredHeight();
-            child.layout(childLeft, childTop, r-l-childLeft - childRight, childHeight + childTop);
+            child.layout(childLeft, childTop, r - l - childLeft - childRight, childHeight + childTop);
         }
         ensureTranslationOrder();
     }
@@ -151,9 +148,8 @@ public class BannerSwitch extends ViewGroup {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         mIsTouched = true;
-        if(ev.getAction()==MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL){
+        if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL) {
             mIsTouched = false;
-            mTouchedEndTime = System.currentTimeMillis();
         }
         return super.dispatchTouchEvent(ev);
     }
@@ -184,7 +180,7 @@ public class BannerSwitch extends ViewGroup {
                 mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
                 mIsUnableToDrag = false;
 
-                if (mSwitchAnimator !=null && mSwitchAnimator.isStarted() && mSwitchAnimator.isRunning()) {
+                if (mSwitchAnimator != null && mSwitchAnimator.isStarted() && mSwitchAnimator.isRunning()) {
                     mSwitchAnimator.cancel();
                     mIsBeingDragged = true;
                     requestParentDisallowInterceptTouchEvent(true);
@@ -310,18 +306,18 @@ public class BannerSwitch extends ViewGroup {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if(autoProgress!=null){
+        if (autoProgress != null) {
             autoProgress.isCancel = true;
         }
         autoProgress = new AnimationRun();
-        postDelayed(autoProgress,mSwitchPagePeriod);
+        postDelayed(autoProgress, mSwitchPagePeriod);
 
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if(autoProgress!=null){
+        if (autoProgress != null) {
             autoProgress.isCancel = true;
         }
     }
@@ -339,7 +335,6 @@ public class BannerSwitch extends ViewGroup {
         }
         return true;
     }
-
 
 
     // 取消父类打断触摸事件传递
@@ -368,7 +363,7 @@ public class BannerSwitch extends ViewGroup {
         float oldScrollX = getScrollX();
         float scrollX = oldScrollX + deltaX;
         mLastMotionX += scrollX - (int) scrollX;
-        mSelectIndex -= deltaX/getWidth();
+        mSelectIndex -= deltaX / getWidth();
         ensureTranslationOrder();
     }
 
@@ -377,32 +372,39 @@ public class BannerSwitch extends ViewGroup {
         final int size = getChildCount();
         for (int i = 0; i < size; ++i) {
             final View child = getChildAt(i);
-                child.setDrawingCacheEnabled(true);
+            child.setDrawingCacheEnabled(true);
         }
     }
 
     // 状态恢复
-    private void startFly( boolean force) {
+    private void startFly(boolean force) {
         double diff = mSelectIndex - Math.rint(mSelectIndex);
-        if(diff ==0 && !force) return;
+        if (diff == 0 && !force) return;
 
-        if(mSwitchAnimator !=null) mSwitchAnimator.cancel();
-
+        if (mSwitchAnimator != null) mSwitchAnimator.cancel();
         final float mTarget;
-        final float mStart = mSelectIndex;
-        if(force){
-            mTarget = (int) (Math.rint(mSelectIndex) -1);
-        }else if(Math.abs(diff)<0.1){
+
+        if (force) {
+            mTarget = (int) (Math.rint(mSelectIndex) - 1);
+        } else if (Math.abs(diff) < 0.05) {
             mTarget = (int) Math.rint(mSelectIndex);
-        }else if(diff>0){
-            mTarget = (int) (Math.rint(mSelectIndex) +1);
-        }else {
-            mTarget = (int) (Math.rint(mSelectIndex) -1);
+        } else if (mLastMotionX - mInitialMotionX > 0) {
+            if (Math.abs((int) mSelectIndex - mSelectIndex) > 0.5 && mSelectIndex < 0 || Math.abs((int) mSelectIndex - mSelectIndex) <= 0.5 && mSelectIndex > 0) {
+                mTarget = (int) (Math.rint(mSelectIndex) + 1);
+            } else {
+                mTarget = (int) (Math.rint(mSelectIndex));
+            }
+        } else {
+            if (Math.abs((int) mSelectIndex - mSelectIndex) > 0.5 && mSelectIndex < 0 || Math.abs((int) mSelectIndex - mSelectIndex) <= 0.5 && mSelectIndex > 0) {
+                mTarget = (int) (Math.rint(mSelectIndex));
+            } else {
+                mTarget = (int) (Math.rint(mSelectIndex) - 1);
+            }
         }
 
 
-        mSwitchAnimator = ValueAnimator.ofFloat(mStart, mTarget);
-        mSwitchAnimator.setDuration(Math.max(100,(int) Math.abs((mStart - mTarget) * mSwitchAnimationPeriod)));
+        mSwitchAnimator = ValueAnimator.ofFloat(mSelectIndex, mTarget);
+        mSwitchAnimator.setDuration(Math.max(100, (int) Math.abs((mSelectIndex - mTarget) * mSwitchAnimationPeriod)));
         mSwitchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -411,6 +413,8 @@ public class BannerSwitch extends ViewGroup {
             }
         });
         mSwitchAnimator.start();
+
+        mSwitchEndTime = System.currentTimeMillis() + mSwitchAnimator.getDuration() + 100;
 
     }
 
@@ -443,6 +447,7 @@ public class BannerSwitch extends ViewGroup {
 
     public interface OnPageChangeListener {
         void onPageSelected(int position);
+
         void onPageScroll(float mScroll);
     }
 

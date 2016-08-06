@@ -5,8 +5,13 @@
         <attr name="pow_checked_drawable" format="reference"/>
         <attr name="pow_checked_bac" format="reference"/>
         <attr name="pow_checked_hei" format="integer"/>
-        <attr name="pow_max_item" format="integer"/>
+        <attr name="pow_fixed_item" format="integer"/>
         <attr name="pow_show_over_scroll" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="BannerSwitch">
+        <attr name="pow_banner_switch_period" format="integer"/>
+        <attr name="pow_banner_switch_animation_period" format="integer"/>
     </declare-styleable>
 
     <declare-styleable name="PowSwitch">
@@ -17,9 +22,6 @@
         <attr name="pow_switch_padding" format="dimension"/>
     </declare-styleable>
 
-    <declare-styleable name="BannerSwitch">
-        <attr name="pow_banner_switch_period" format="integer"/>
-        <attr name="pow_banner_switch_animation_period" format="integer"/>
-    </declare-styleable>
+
 
 </resources>
