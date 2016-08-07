@@ -30,7 +30,7 @@ public class SimpleSlideSwitch extends AppCompatActivity {
 
         slideSwitch.setOnPageChangeListener(new SlideSwitch.OnPageChangeListener() {
             @Override
-            public void onPageSelected(int position) {
+            public void onPageClicked(int position) {
                 viewPager.setCurrentItem(position);
             }
 

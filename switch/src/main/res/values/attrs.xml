@@ -10,8 +10,10 @@
     </declare-styleable>
 
     <declare-styleable name="BannerSwitch">
-        <attr name="pow_banner_switch_period" format="integer"/>
-        <attr name="pow_banner_switch_animation_period" format="integer"/>
+        <attr name="pow_switch_fixed_item" format="integer"/>
+        <attr name="pow_switch_auto_ennable" format="boolean"/>
+        <attr name="pow_switch_period" format="integer"/>
+        <attr name="pow_switch_animation_period" format="integer"/>
     </declare-styleable>
 
     <declare-styleable name="PowSwitch">

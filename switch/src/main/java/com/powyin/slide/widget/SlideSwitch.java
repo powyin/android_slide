@@ -83,6 +83,7 @@ public class SlideSwitch extends ViewGroup {
 
         setScrollingCacheEnabled(true);
         mScroller = new Scroller(context);
+
         ViewConfiguration configuration = ViewConfiguration.get(context);
         mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
         mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
@@ -304,6 +305,7 @@ public class SlideSwitch extends ViewGroup {
             mVelocityTracker = VelocityTracker.obtain();
         }
         mVelocityTracker.addMovement(ev);
+
         return mIsBeingDragged;
     }
 
@@ -399,7 +401,7 @@ public class SlideSwitch extends ViewGroup {
                 if (mSelectIndex != i) {
                     preformItemSelectAnimationClick(i);
                     if (mOnPageChangeListener != null) {
-                        mOnPageChangeListener.onPageSelected(i);
+                        mOnPageChangeListener.onPageClicked(i);
                     }
                 }
                 break;
@@ -481,9 +483,11 @@ public class SlideSwitch extends ViewGroup {
     }
 
     private void startFly() {
+
         mVelocityTracker.computeCurrentVelocity(500, mMaximumVelocity);
         int initialVelocity = (int) VelocityTrackerCompat.getXVelocity(
                 mVelocityTracker, mActivePointerId);
+
         int scrollX = getScrollX();
         int maxScrollX = mMaxWid + getPaddingLeft() + getPaddingRight() - getWidth();
         mScroller.abortAnimation();
@@ -720,8 +724,7 @@ public class SlideSwitch extends ViewGroup {
     }
 
     public interface OnPageChangeListener {
-        void onPageSelected(int position);
-
+        void onPageClicked(int position);
         void onPageScroll(float mScroll);
     }
 }
