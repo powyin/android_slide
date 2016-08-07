@@ -380,7 +380,7 @@ public class SlideSwitch extends ViewGroup {
                 }
             case MotionEvent.ACTION_CANCEL:
                 if (mIsBeingDragged) {
-                    startFly();
+                    startInternalFly();
                     ViewCompat.postInvalidateOnAnimation(this);
                 }
                 mActivePointerId = INVALID_POINTER;
@@ -499,7 +499,7 @@ public class SlideSwitch extends ViewGroup {
         }
     }
 
-    private void startFly() {
+    private void startInternalFly() {
 
         mVelocityTracker.computeCurrentVelocity(500, mMaximumVelocity);
         int initialVelocity = (int) VelocityTrackerCompat.getXVelocity(

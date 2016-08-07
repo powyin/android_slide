@@ -55,7 +55,7 @@ public class PowSwitch extends View {
         mSwitchSuggestWei = (int)(36*density);
         mSwitchSuggestHei = (int)(16*density);
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SlideSwitch);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PowSwitch);
 
         mSwitchBacOff = a.getDrawable(R.styleable.PowSwitch_pow_switch_bac_off);
         if(mSwitchBacOff==null){
@@ -74,7 +74,7 @@ public class PowSwitch extends View {
             mSwitchIconOn = context.getResources().getDrawable(R.drawable.powyin_switch_pow_switch_icon_on);
         }
 
-        mSwitchPadding = a.getInt(R.styleable.PowSwitch_pow_switch_padding,(int)(2*density));
+        mSwitchPadding = (int)(a.getDimension(R.styleable.PowSwitch_pow_switch_padding,(int)(2*density))+0.5f);
 
         a.recycle();
 

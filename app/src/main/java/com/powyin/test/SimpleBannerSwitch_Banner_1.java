@@ -7,9 +7,9 @@ import android.view.View;
 import com.powyin.slide.widget.BannerSwitch;
 
 /**
- * Created by powyin on 2016/8/5.
+ * Created by powyin on 2016/8/7.
  */
-public class SimpleBannerSwitch extends Activity {
+public class SimpleBannerSwitch_Banner_1 extends Activity {
 
     BannerSwitch bannerSwitch;
 
@@ -17,7 +17,7 @@ public class SimpleBannerSwitch extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_simple_banner_switch);
+        setContentView(R.layout.activity_simple_banner_switch_banner_1);
         bannerSwitch = (BannerSwitch)findViewById(R.id.my_banner);
 
         bannerSwitch.setOnItemClickListener(new BannerSwitch.OnItemClickListener() {

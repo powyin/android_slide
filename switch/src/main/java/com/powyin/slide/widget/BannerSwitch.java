@@ -42,24 +42,23 @@ public class BannerSwitch extends ViewGroup {
     private AnimationRun autoProgress;
 
     private int mSwitchFixedItem;
-    private boolean mSwitchEnnable;
+    private boolean mSwitchEnable;
     private int mSwitchPagePeriod;
     private int mSwitchAnimationPeriod;
-    private boolean mIsTouched = false;
+    private boolean mIsTouched ;
     private long mSwitchEndTime;
 
     // 横幅滚动轴；
-    float mSelectIndex;
+    private float mSelectIndex;
 
     private class AnimationRun implements Runnable {
         boolean isCancel;
-
         @Override
         public void run() {
-            if (isCancel || !mSwitchEnnable) return;
+            if (isCancel || !mSwitchEnable) return;
             long pre = (System.currentTimeMillis() - mSwitchEndTime);
             if (getVisibility() == VISIBLE && !mIsTouched && pre >= mSwitchPagePeriod / 3) {
-                startFly(true);
+                startInternalFlySwipePage(-1);
             }
 
             if (pre >= mSwitchPagePeriod / 3) {
@@ -83,13 +82,13 @@ public class BannerSwitch extends ViewGroup {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BannerSwitch);
 
         mSwitchFixedItem = a.getInt(R.styleable.BannerSwitch_pow_switch_fixed_item,3);
-        mSwitchEnnable = a.getBoolean(R.styleable.BannerSwitch_pow_switch_auto_ennable,true);
+        mSwitchEnable = a.getBoolean(R.styleable.BannerSwitch_pow_switch_auto_ennable,true);
 
         mSwitchPagePeriod = a.getInt(R.styleable.BannerSwitch_pow_switch_period, 2450);
         mSwitchPagePeriod = Math.max(1500, mSwitchPagePeriod);
         mSwitchPagePeriod = Math.min(10000, mSwitchPagePeriod);
 
-        mSwitchAnimationPeriod = a.getInt(R.styleable.BannerSwitch_pow_switch_animation_period, 450);
+        mSwitchAnimationPeriod = a.getInt(R.styleable.BannerSwitch_pow_switch_animation_period, 350);
         mSwitchAnimationPeriod = Math.max(100, mSwitchAnimationPeriod);
         mSwitchAnimationPeriod = Math.max(1000, mSwitchAnimationPeriod);
 
@@ -101,6 +100,8 @@ public class BannerSwitch extends ViewGroup {
         mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
         mScroller = new Scroller(context);
         mVelocityTracker = VelocityTracker.obtain();
+
+
     }
 
     @Override
@@ -179,7 +180,7 @@ public class BannerSwitch extends ViewGroup {
             mIsUnableToDrag = false;
             mActivePointerId = INVALID_POINTER;
 
-            if(!mSwitchEnnable ){
+            if(!mSwitchEnable){
                 if (mVelocityTracker != null) {
                     mVelocityTracker.clear();
                 }
@@ -249,7 +250,7 @@ public class BannerSwitch extends ViewGroup {
                 break;
         }
 
-        if(!mSwitchEnnable ){
+        if(!mSwitchEnable){
             if (mVelocityTracker == null) {
                 mVelocityTracker = VelocityTracker.obtain();
             }
@@ -262,7 +263,7 @@ public class BannerSwitch extends ViewGroup {
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
 
-        if(!mSwitchEnnable  ){
+        if(!mSwitchEnable){
             if (mVelocityTracker == null) {
                 mVelocityTracker = VelocityTracker.obtain();
             }
@@ -316,12 +317,12 @@ public class BannerSwitch extends ViewGroup {
                 }
             case MotionEvent.ACTION_CANCEL:
                 if (mIsBeingDragged) {
-                    startFly(false);
+                    startInternalFly();
                     ViewCompat.postInvalidateOnAnimation(this);
                 }
                 mActivePointerId = INVALID_POINTER;
 
-                if(!mSwitchEnnable ){
+                if(!mSwitchEnable){
                     if(mVelocityTracker!=null){
                         mVelocityTracker.clear();
                     }
@@ -353,9 +354,9 @@ public class BannerSwitch extends ViewGroup {
         if (autoProgress != null) {
             autoProgress.isCancel = true;
         }
-        if(mSwitchEnnable){
+        if(mSwitchEnable){
             autoProgress = new AnimationRun();
-            postDelayed(autoProgress, mSwitchPagePeriod);
+            postDelayed(autoProgress, (int)(mSwitchPagePeriod/1.5f));
         }
     }
 
@@ -403,7 +404,7 @@ public class BannerSwitch extends ViewGroup {
             final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
             mLastMotionX = MotionEventCompat.getX(ev, newPointerIndex);
             mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
-            if(!mSwitchEnnable ){
+            if(!mSwitchEnable){
                 if (mVelocityTracker != null) {
                     mVelocityTracker.clear();
                 }
@@ -433,10 +434,10 @@ public class BannerSwitch extends ViewGroup {
         }
     }
 
-    // 状态恢复
-    private void startFly(boolean force) {
+    // 抬手后状态恢复动画
+    private void startInternalFly() {
 
-        if(!mSwitchEnnable ){
+        if(!mSwitchEnable){
             float pace =  Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), 0)/mSwitchFixedItem;
             if(pace<0) {
                 return;
@@ -469,18 +470,17 @@ public class BannerSwitch extends ViewGroup {
                 }
             });
             mSwitchAnimator.start();
-
+            mSwitchEndTime = System.currentTimeMillis() + mSwitchAnimator.getDuration() + 100;
         }else {
 
             double diff = mSelectIndex - Math.rint(mSelectIndex);
-            if (diff == 0 && !force) return;
+
+            if (diff == 0 ) return;
 
             if (mSwitchAnimator != null) mSwitchAnimator.cancel();
             final float mTarget;
 
-            if (force) {
-                mTarget = (int) (Math.rint(mSelectIndex) - 1);
-            } else if (Math.abs(diff) < 0.05) {
+            if (Math.abs(diff) < 0.05) {
                 mTarget = (int) Math.rint(mSelectIndex);
             } else if (mLastMotionX - mInitialMotionX > 0) {
                 if (Math.abs((int) mSelectIndex - mSelectIndex) > 0.5 && mSelectIndex < 0 || Math.abs((int) mSelectIndex - mSelectIndex) <= 0.5 && mSelectIndex > 0) {
@@ -507,17 +507,38 @@ public class BannerSwitch extends ViewGroup {
                 }
             });
             mSwitchAnimator.start();
-
             mSwitchEndTime = System.currentTimeMillis() + mSwitchAnimator.getDuration() + 100;
-
         }
     }
 
+    // 自动轮播动画
+    private void startInternalFlySwipePage(int step){
+        if (mSwitchAnimator != null && mSwitchAnimator.isStarted() && mSwitchAnimator.isRunning()){
+            return;
+        }
+
+        float mTarget  = (int) (Math.rint(mSelectIndex) + step);
+        mSwitchAnimator = ValueAnimator.ofFloat(mSelectIndex, mTarget);
+        mSwitchAnimator.setDuration(Math.max(50, (int) Math.abs((mSelectIndex - mTarget) * mSwitchAnimationPeriod)/mSwitchFixedItem));
+        mSwitchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mSelectIndex = (float) animation.getAnimatedValue();
+                ensureTranslationOrder();
+            }
+        });
+        mSwitchAnimator.start();
+        mSwitchEndTime = System.currentTimeMillis() + mSwitchAnimator.getDuration() + 50;
+    }
+
     // 实现viewItem滚动总入口
+    // 不要问为什么 这些东西是除法的精妙  没有为什么
     private void ensureTranslationOrder() {
+
         int count = getChildCount();
         float pace =  Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), 0)/mSwitchFixedItem;
         if (count < 2 || pace<=0) return;
+
         for (int i = 0; i < count; i++) {
             int x = (int) ((i + mSelectIndex) * pace);
             int transX = x % (int)(count * pace);
@@ -536,8 +557,32 @@ public class BannerSwitch extends ViewGroup {
     //------------------------------------------------------------------setting-----------------------------------------------------------//
 
 
+    // 获得中心位置的View index；
     public int getCenterPageIndex (){
+        int centerX = getWidth()/2;
+        int centerY = getHeight()/2;
+        for (int i = 0; i < getChildCount(); i++) {
+            Rect globeRect = new Rect();
+            View view = getChildAt(i);
+            globeRect.top = view.getTop();
+            globeRect.left = view.getLeft() + (int)view.getTranslationX() ;
+            globeRect.right = view.getRight() + (int) view.getTranslationX() ;
+            globeRect.bottom = view.getBottom();
+            if(globeRect.contains(centerX,centerY)){
+                return i;
+            }
+        }
         return -1;
+    }
+
+    // 右移一个Item宽度
+    public void offsetItemToNext(){
+        startInternalFlySwipePage(-1);
+    }
+
+    // 左移一个Item宽度
+    public void offsetItemToPre(){
+        startInternalFlySwipePage(1);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

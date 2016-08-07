@@ -18,7 +18,7 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:background="@drawable/button_bg"
-            android:text="SlideSwitch"
+            android:text="SlideSwitch_SINGLE"
             android:onClick="onClick"/>
         <Space
             android:layout_width="1dp"
@@ -33,15 +33,17 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:background="@drawable/button_bg"
-            android:text="SlideSwitchMultiple"
+            android:text="SlideSwitch_MULTIPLE"
             android:onClick="onClick"/>
 
         <Space
         android:layout_width="1dp"
-        android:layout_height="5dp" />
+        android:layout_height="15dp" />
+
+
 
         <TextView
-            android:id="@+id/click_to_banner"
+            android:id="@+id/click_to_banner_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="20dp"
@@ -49,12 +51,44 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:background="@drawable/button_bg"
-            android:text="BannerSwitch"
+            android:text="BannerSwitch_1"
             android:onClick="onClick" />
 
         <Space
             android:layout_width="1dp"
             android:layout_height="5dp" />
+
+        <TextView
+            android:id="@+id/click_to_banner_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:background="@drawable/button_bg"
+            android:text="BannerSwitch_3"
+            android:onClick="onClick" />
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="5dp" />
+
+        <TextView
+            android:id="@+id/click_to_banner_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:background="@drawable/button_bg"
+            android:text="BannerSwitch_NO"
+            android:onClick="onClick" />
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="15dp" />
 
         <TextView
             android:id="@+id/click_to_pow_switch"

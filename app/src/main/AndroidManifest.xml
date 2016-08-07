@@ -16,9 +16,14 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SimpleSlideSwitch"/>
+        <activity android:name=".SimpleSlideSwitchSingle"/>
         <activity android:name=".SimpleSlideSwitchMultiple"/>
-        <activity android:name=".SimpleBannerSwitch"/>
+        <activity android:name=".SimpleBannerSwitch_No_Auto"/>
+        <activity android:name=".SimpleBannerSwitch_Banner_1"/>
+        <activity android:name=".SimpleBannerSwitch_Banner_3"/>
+
+
+
         <activity android:name=".SimplePowSwitch"/>
     </application>
 

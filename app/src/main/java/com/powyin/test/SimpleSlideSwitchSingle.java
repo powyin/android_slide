@@ -10,7 +10,7 @@ import com.powyin.slide.widget.SlideSwitch;
 /**
  * Created by powyin on 2016/8/4.
  */
-public class SimpleSlideSwitch extends AppCompatActivity {
+public class SimpleSlideSwitchSingle extends AppCompatActivity {
 
     SlideSwitch slideSwitch;
     ViewPager viewPager;
