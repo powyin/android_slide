@@ -3,6 +3,7 @@ package com.powyin.slide.widget;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.database.DataSetObserver;
 import android.graphics.Rect;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.VelocityTrackerCompat;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.ListAdapter;
 import android.widget.Scroller;
 
 import com.powyin.slide.R;
@@ -35,21 +37,26 @@ public class BannerSwitch extends ViewGroup {
     private int mActivePointerId = INVALID_POINTER;
     private static final int INVALID_POINTER = -1;
     private int mMaximumVelocity;
-
     private OnItemClickListener mOnItemClickListener;
-
+    private OnButtonLineScrollListener mOnButtonLineScrollListener;
     private ValueAnimator mSwitchAnimator;
     private AnimationRun autoProgress;
-
     private int mSwitchFixedItem;
     private boolean mSwitchEnable;
     private int mSwitchPagePeriod;
     private int mSwitchAnimationPeriod;
     private boolean mIsTouched ;
     private long mSwitchEndTime;
+    private float mSelectIndex;             // 横幅滚动轴；
+    private ListAdapter mListAdapter;
 
-    // 横幅滚动轴；
-    private float mSelectIndex;
+    private final DataSetObserver mDataSetObserver = new DataSetObserver() {
+        @Override
+        public void onChanged() {
+            super.onChanged();
+        }
+
+    };
 
     private class AnimationRun implements Runnable {
         boolean isCancel;
@@ -84,7 +91,7 @@ public class BannerSwitch extends ViewGroup {
         mSwitchFixedItem = a.getInt(R.styleable.BannerSwitch_pow_switch_fixed_item,3);
         mSwitchEnable = a.getBoolean(R.styleable.BannerSwitch_pow_switch_auto_ennable,true);
 
-        mSwitchPagePeriod = a.getInt(R.styleable.BannerSwitch_pow_switch_period, 2450);
+        mSwitchPagePeriod = a.getInt(R.styleable.BannerSwitch_pow_switch_period, 9000); //2450
         mSwitchPagePeriod = Math.max(1500, mSwitchPagePeriod);
         mSwitchPagePeriod = Math.min(10000, mSwitchPagePeriod);
 
@@ -532,12 +539,19 @@ public class BannerSwitch extends ViewGroup {
     }
 
     // 实现viewItem滚动总入口
-    // 不要问为什么 这些东西是除法的精妙  没有为什么
+    // 不要问为什么 这些东西是 / % 的问题  没有为什么
     private void ensureTranslationOrder() {
 
         int count = getChildCount();
         float pace =  Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), 0)/mSwitchFixedItem;
         if (count < 2 || pace<=0) return;
+
+        if(mOnButtonLineScrollListener !=null){
+            float index = (mSwitchFixedItem/2 - mSelectIndex) % count;
+            if(index<0) index += count;
+            mOnButtonLineScrollListener.onButtonLineScroll(index,count);
+        }
+
 
         for (int i = 0; i < count; i++) {
             int x = (int) ((i + mSelectIndex) * pace);
@@ -554,46 +568,83 @@ public class BannerSwitch extends ViewGroup {
         }
     }
 
+    private void  computeAdapter(){
+        removeAllViews();
+
+    }
+
     //------------------------------------------------------------------setting-----------------------------------------------------------//
 
-
-    // 获得中心位置的View index；
-    public int getCenterPageIndex (){
-        int centerX = getWidth()/2;
-        int centerY = getHeight()/2;
-        for (int i = 0; i < getChildCount(); i++) {
-            Rect globeRect = new Rect();
-            View view = getChildAt(i);
-            globeRect.top = view.getTop();
-            globeRect.left = view.getLeft() + (int)view.getTranslationX() ;
-            globeRect.right = view.getRight() + (int) view.getTranslationX() ;
-            globeRect.bottom = view.getBottom();
-            if(globeRect.contains(centerX,centerY)){
-                return i;
-            }
+    public void setAdapter(ListAdapter adapter){
+        if(mListAdapter!=null){
+            mListAdapter.unregisterDataSetObserver(mDataSetObserver);
         }
-        return -1;
-    }
 
-    // 右移一个Item宽度
-    public void offsetItemToNext(){
-        startInternalFlySwipePage(-1);
-    }
+        mListAdapter = adapter;
+        if(adapter!=null){
+            adapter.registerDataSetObserver(mDataSetObserver);
+        }
 
-    // 左移一个Item宽度
-    public void offsetItemToPre(){
-        startInternalFlySwipePage(1);
+        computeAdapter();
+
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.mOnItemClickListener = listener;
     }
 
+    public void setOnButtonLineScrollListener(OnButtonLineScrollListener listener){
+        this.mOnButtonLineScrollListener = listener;
+    }
+
     public interface OnItemClickListener {
         void onItemClicked(int position , View view);
     }
 
+    public interface OnButtonLineScrollListener {
+        //  0<= mScroll < viewCount;  0 代表其中心View在0位置上； viewCount-0.00001 代表 其中心 右移 接近 0 位置上
+        void onButtonLineScroll(float mScroll , int viewCount);
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//----------------------------------cache-------------------------------
+
+
+//    // 右移一个Item宽度
+//    public void offsetItemToNext(){
+//        startInternalFlySwipePage(-1);
+//    }
+//
+//    // 左移一个Item宽度
+//    public void offsetItemToPre(){
+//        startInternalFlySwipePage(1);
+//    }
+
+
+
 
 
 

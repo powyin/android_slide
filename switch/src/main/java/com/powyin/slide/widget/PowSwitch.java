@@ -31,7 +31,6 @@ public class PowSwitch extends View {
     private int mActivePointerId = INVALID_POINTER;
     private static final int INVALID_POINTER = -1;
     private ValueAnimator valueAnimator;
-
     private Drawable mSwitchBacOn;
     private Drawable mSwitchBacOff;
     private Drawable mSwitchIconOn;
@@ -39,11 +38,9 @@ public class PowSwitch extends View {
     private int mSwitchPadding;
     private int mSwitchSuggestWei;
     private int mSwitchSuggestHei;
-
     Rect iconRect = new Rect();
     Rect iconFixedRect = new Rect();
     Rect bacRect = new Rect();
-
     int targetMax;
     int targetCurrent;
 

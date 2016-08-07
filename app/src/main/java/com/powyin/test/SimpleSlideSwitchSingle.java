@@ -34,7 +34,7 @@ public class SimpleSlideSwitchSingle extends AppCompatActivity {
 
         slideSwitch.setOnButtonLineScrollListener(new SlideSwitch.OnButtonLineScrollListener() {
             @Override
-            public void onButtonLineScroll(float mScroll) {
+            public void onButtonLineScroll(float mScroll , int viewCount) {
 
             }
         });

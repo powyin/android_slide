@@ -4,6 +4,7 @@ import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.Rect;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.ListAdapter;
 import android.widget.Scroller;
 
 import com.powyin.slide.R;
@@ -31,6 +33,7 @@ import java.util.List;
  * Created by powyin on 2016/8/2.
  */
 public class SlideSwitch extends ViewGroup {
+
     private Scroller mScroller;
     private VelocityTracker mVelocityTracker;
     private boolean mIsBeingDragged;
@@ -57,6 +60,15 @@ public class SlideSwitch extends ViewGroup {
     private List<View> mMatchParentChildren = new ArrayList<>();
     private OnItemClickListener mOnItemClickListener;
     private OnButtonLineScrollListener mOnButtonLineScrollListener;
+    private ListAdapter mListAdapter;
+
+    private final DataSetObserver mDataSetObserver = new DataSetObserver() {
+        @Override
+        public void onChanged() {
+            super.onChanged();
+        }
+
+    };
 
     public SlideSwitch(Context context) {
         this(context, null, 0);
@@ -553,7 +565,7 @@ public class SlideSwitch extends ViewGroup {
                     calculationRect(false);
                     if (left != mSelectDrawableRect.left || right != mSelectDrawableRect.right) {
                         if (mOnButtonLineScrollListener != null) {
-                            mOnButtonLineScrollListener.onButtonLineScroll(mSelectIndex);
+                            mOnButtonLineScrollListener.onButtonLineScroll(mSelectIndex,getChildCount());
                         }
                         ViewCompat.postInvalidateOnAnimation(SlideSwitch.this);
                     }
@@ -615,7 +627,7 @@ public class SlideSwitch extends ViewGroup {
             calculationRect(false);
             if (left != mSelectDrawableRect.left || right != mSelectDrawableRect.right) {
                 if (mOnButtonLineScrollListener != null) {
-                    mOnButtonLineScrollListener.onButtonLineScroll(mSelectIndex);
+                    mOnButtonLineScrollListener.onButtonLineScroll(mSelectIndex,getChildCount());
                 }
                 ViewCompat.postInvalidateOnAnimation(SlideSwitch.this);
             }
@@ -686,6 +698,12 @@ public class SlideSwitch extends ViewGroup {
         return (int) ((endScrollX - startScrollX) * positionOffset + startScrollX);
     }
 
+    private void  computeAdapter(){
+        removeAllViews();
+
+    }
+
+
     @Override
     public LayoutParams generateLayoutParams(AttributeSet attrs) {
         return new LayoutParams(getContext(), attrs);
@@ -736,6 +754,20 @@ public class SlideSwitch extends ViewGroup {
         return mViewPageChangeListener;
     }
 
+    public void setAdapter(ListAdapter adapter){
+        if(mListAdapter!=null){
+            mListAdapter.unregisterDataSetObserver(mDataSetObserver);
+        }
+
+        mListAdapter = adapter;
+        if(adapter!=null){
+            adapter.registerDataSetObserver(mDataSetObserver);
+        }
+
+        computeAdapter();
+
+    }
+
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.mOnItemClickListener = listener;
     }
@@ -749,7 +781,7 @@ public class SlideSwitch extends ViewGroup {
     }
 
     public interface OnButtonLineScrollListener {
-        void onButtonLineScroll(float mScroll);
+        void onButtonLineScroll(float mScroll , int viewCount);
     }
 
 }

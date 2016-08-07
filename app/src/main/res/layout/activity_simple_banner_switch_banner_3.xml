@@ -5,121 +5,133 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.powyin.slide.widget.BannerSwitch
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        app:pow_switch_auto_ennable="true"
-        app:pow_switch_fixed_item="3"
-        android:id="@+id/my_banner" >
+        android:layout_height="200dp">
 
-
-        <FrameLayout
+        <com.powyin.slide.widget.BannerSwitch
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            >
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/a" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="0"
-                android:textColor="#00d9fa"
-                android:textSize="15sp" />
-        </FrameLayout>
+            app:pow_switch_auto_ennable="true"
+            app:pow_switch_fixed_item="3"
+            android:id="@+id/my_banner" >
 
-        <FrameLayout
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/a" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="0"
+                    android:textColor="#00d9fa"
+                    android:textSize="15sp" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/b" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="1"
+                    android:textColor="#00d9fa"
+                    android:textSize="15sp" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/c" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="2"
+                    android:textColor="#00d9fa"
+                    android:textSize="15sp" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/d" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="3"
+                    android:textColor="#00d9fa"
+                    android:textSize="15sp" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                >
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/e" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="4"
+                    android:textColor="#00d9fa"
+                    android:textSize="15sp" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/f" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="5"
+                    android:textColor="#00d9fa"
+                    android:textSize="15sp" />
+            </FrameLayout>
+
+
+        </com.powyin.slide.widget.BannerSwitch>
+
+        <com.powyin.slide.widget.BannerUpperView
+            android:id="@+id/my_banner_upper_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/b" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="1"
-                android:textColor="#00d9fa"
-                android:textSize="15sp" />
-        </FrameLayout>
+            android:layout_height="match_parent" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/c" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="2"
-                android:textColor="#00d9fa"
-                android:textSize="15sp" />
-        </FrameLayout>
+    </FrameLayout>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/d" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="3"
-                android:textColor="#00d9fa"
-                android:textSize="15sp" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
-            >
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/e" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="4"
-                android:textColor="#00d9fa"
-                android:textSize="15sp" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/f" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="5"
-                android:textColor="#00d9fa"
-                android:textSize="15sp" />
-        </FrameLayout>
-
-
-    </com.powyin.slide.widget.BannerSwitch>
 
     <TextView
         android:layout_width="match_parent"
