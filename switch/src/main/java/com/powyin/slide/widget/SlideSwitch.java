@@ -35,6 +35,7 @@ public class SlideSwitch extends ViewGroup {
     private VelocityTracker mVelocityTracker;
     private boolean mIsBeingDragged;
     private boolean mIsUnableToDrag;
+    private boolean mIsMultipleFinger;
     private int mTouchSlop;
     private float mLastMotionX;
     private float mInitialMotionX;
@@ -54,7 +55,8 @@ public class SlideSwitch extends ViewGroup {
     private Rect mSelectDrawableRectBac = new Rect();                     //选择区域背景 边界
     private Path mSelectDrawablePath = new Path();                        //选择区域背景 绘制边界
     private List<View> mMatchParentChildren = new ArrayList<>();
-    private OnPageChangeListener mOnPageChangeListener;
+    private OnItemClickListener mOnItemClickListener;
+    private OnButtonLineScrollListener mOnButtonLineScrollListener;
 
     public SlideSwitch(Context context) {
         this(context, null, 0);
@@ -227,6 +229,21 @@ public class SlideSwitch extends ViewGroup {
         super.dispatchDraw(canvas);
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+
+        final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
+
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+            mIsMultipleFinger = false;
+        }
+
+        if(action == MotionEvent.ACTION_POINTER_DOWN){
+            mIsMultipleFinger = true;
+        }
+
+        return super.dispatchTouchEvent(ev);
+    }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
@@ -358,7 +375,7 @@ public class SlideSwitch extends ViewGroup {
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchSlop / 1.5f) {
+                if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchSlop && !mIsMultipleFinger) {
                     performItemClick();
                 }
             case MotionEvent.ACTION_CANCEL:
@@ -400,8 +417,8 @@ public class SlideSwitch extends ViewGroup {
             if (globeRect.contains((int) mInitialMotionX, (int) mInitialMotionY)) {
                 if (mSelectIndex != i) {
                     preformItemSelectAnimationClick(i);
-                    if (mOnPageChangeListener != null) {
-                        mOnPageChangeListener.onPageClicked(i);
+                    if (mOnItemClickListener != null) {
+                        mOnItemClickListener.onItemClicked(i);
                     }
                 }
                 break;
@@ -535,8 +552,8 @@ public class SlideSwitch extends ViewGroup {
 
                     calculationRect(false);
                     if (left != mSelectDrawableRect.left || right != mSelectDrawableRect.right) {
-                        if (mOnPageChangeListener != null) {
-                            mOnPageChangeListener.onPageScroll(mSelectIndex);
+                        if (mOnButtonLineScrollListener != null) {
+                            mOnButtonLineScrollListener.onButtonLineScroll(mSelectIndex);
                         }
                         ViewCompat.postInvalidateOnAnimation(SlideSwitch.this);
                     }
@@ -597,8 +614,8 @@ public class SlideSwitch extends ViewGroup {
             mSelectIndex = position + positionOffset;
             calculationRect(false);
             if (left != mSelectDrawableRect.left || right != mSelectDrawableRect.right) {
-                if (mOnPageChangeListener != null) {
-                    mOnPageChangeListener.onPageScroll(mSelectIndex);
+                if (mOnButtonLineScrollListener != null) {
+                    mOnButtonLineScrollListener.onButtonLineScroll(mSelectIndex);
                 }
                 ViewCompat.postInvalidateOnAnimation(SlideSwitch.this);
             }
@@ -719,13 +736,21 @@ public class SlideSwitch extends ViewGroup {
         return mViewPageChangeListener;
     }
 
-    public void setOnPageChangeListener(OnPageChangeListener listener) {
-        this.mOnPageChangeListener = listener;
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mOnItemClickListener = listener;
     }
 
-    public interface OnPageChangeListener {
-        void onPageClicked(int position);
-        void onPageScroll(float mScroll);
+    public void setOnButtonLineScrollListener (OnButtonLineScrollListener listener){
+        this.mOnButtonLineScrollListener = listener;
     }
+
+    public interface OnItemClickListener {
+        void onItemClicked(int position);
+    }
+
+    public interface OnButtonLineScrollListener {
+        void onButtonLineScroll(float mScroll);
+    }
+
 }
 

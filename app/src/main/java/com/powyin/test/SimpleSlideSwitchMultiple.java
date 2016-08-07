@@ -25,15 +25,18 @@ public class SimpleSlideSwitchMultiple extends AppCompatActivity {
         viewPager.addOnPageChangeListener(slideSwitch.getSupportOnPageChangeListener());
         viewPager.setOffscreenPageLimit(1);
 
-        slideSwitch.setOnPageChangeListener(new SlideSwitch.OnPageChangeListener() {
+        slideSwitch.setOnItemClickListener(new SlideSwitch.OnItemClickListener() {
             @Override
-            public void onPageClicked(int position) {
+            public void onItemClicked(int position) {
                 viewPager.setCurrentItem(position);
             }
 
+        });
+
+        slideSwitch.setOnButtonLineScrollListener(new SlideSwitch.OnButtonLineScrollListener() {
             @Override
-            public void onPageScroll(float mScroll) {
-                System.out.println("-------zzz" + mScroll);
+            public void onButtonLineScroll(float mScroll) {
+
             }
         });
 

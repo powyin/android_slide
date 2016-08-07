@@ -27,6 +27,7 @@ public class BannerSwitch extends ViewGroup {
     private VelocityTracker mVelocityTracker;
     private boolean mIsBeingDragged;
     private boolean mIsUnableToDrag;
+    private boolean mIsMultipleFinger;
     private int mTouchSlop;
     private float mLastMotionX;
     private float mInitialMotionX;
@@ -35,7 +36,7 @@ public class BannerSwitch extends ViewGroup {
     private static final int INVALID_POINTER = -1;
     private int mMaximumVelocity;
 
-    private OnPageChangeListener mOnPageChangeListener;
+    private OnItemClickListener mOnItemClickListener;
 
     private ValueAnimator mSwitchAnimator;
     private AnimationRun autoProgress;
@@ -152,13 +153,21 @@ public class BannerSwitch extends ViewGroup {
     }
 
 
-
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         mIsTouched = true;
-        if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL) {
+
+        final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
+
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
             mIsTouched = false;
+            mIsMultipleFinger = false;
         }
+
+        if(action == MotionEvent.ACTION_POINTER_DOWN){
+            mIsMultipleFinger = true;
+        }
+
         return super.dispatchTouchEvent(ev);
     }
 
@@ -302,7 +311,7 @@ public class BannerSwitch extends ViewGroup {
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchSlop / 1.5f) {
+                if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchSlop && !mIsMultipleFinger) {
                     performItemClick();
                 }
             case MotionEvent.ACTION_CANCEL:
@@ -363,11 +372,16 @@ public class BannerSwitch extends ViewGroup {
         for (int i = 0; i < getChildCount(); i++) {
             Rect globeRect = new Rect();
             View view = getChildAt(i);
-            int currentScrollX = getScrollX();
             globeRect.top = view.getTop();
-            globeRect.left = view.getLeft() - currentScrollX;
-            globeRect.right = view.getRight() - currentScrollX;
+            globeRect.left = view.getLeft() + (int)view.getTranslationX() ;
+            globeRect.right = view.getRight() + (int) view.getTranslationX() ;
             globeRect.bottom = view.getBottom();
+
+            if(globeRect.contains((int)mInitialMotionX,(int)mInitialMotionY)){
+                if(mOnItemClickListener !=null){
+                    mOnItemClickListener.onItemClicked(i,view);
+                }
+            }
         }
         return true;
     }
@@ -517,18 +531,21 @@ public class BannerSwitch extends ViewGroup {
                 getChildAt(i).setTranslationX(transX);
             }
         }
-
     }
 
     //------------------------------------------------------------------setting-----------------------------------------------------------//
 
 
-    public void setOnPageChangeListener(OnPageChangeListener listener) {
-        this.mOnPageChangeListener = listener;
+    public int getCenterPageIndex (){
+        return -1;
     }
 
-    public interface OnPageChangeListener {
-        void onPageSelected(int position);
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mOnItemClickListener = listener;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClicked(int position , View view);
     }
 
 }

@@ -1,14 +1,11 @@
 package com.powyin.test;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.powyin.slide.widget.SlideSwitch;
-
-import java.lang.reflect.AccessibleObject;
 
 /**
  * Created by powyin on 2016/8/4.
@@ -28,18 +25,19 @@ public class SimpleSlideSwitch extends AppCompatActivity {
         viewPager.addOnPageChangeListener(slideSwitch.getSupportOnPageChangeListener());
         viewPager.setOffscreenPageLimit(1);
 
-        slideSwitch.setOnPageChangeListener(new SlideSwitch.OnPageChangeListener() {
+        slideSwitch.setOnItemClickListener(new SlideSwitch.OnItemClickListener() {
             @Override
-            public void onPageClicked(int position) {
+            public void onItemClicked(int position) {
                 viewPager.setCurrentItem(position);
-            }
-
-            @Override
-            public void onPageScroll(float mScroll) {
-            //    System.out.println("-------zzz"+mScroll);
             }
         });
 
+        slideSwitch.setOnButtonLineScrollListener(new SlideSwitch.OnButtonLineScrollListener() {
+            @Override
+            public void onButtonLineScroll(float mScroll) {
+
+            }
+        });
 
 
     }
