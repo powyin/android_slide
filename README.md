@@ -1,8 +1,8 @@
 
 
 
-## SlideSwitch 切换选项卡 可配合ViewPage使用 支持ListAdapter 配置View
-## Banner 轮播广告横幅  支持ListAdapter 配置View
+## SlideSwitch 切换选项卡 可配合ViewPage使用 提供ListAdapter支持
+## BannerSwitch 轮播广告横幅  提供ListAdapter支持
 ## PowSwitch 切换开关 
 
 
@@ -17,7 +17,7 @@ dependencies {
 
 |SlideSwitch(多项Item)|SlideSwitch(少量Item)|PowSwtch(开关)|
 |---|---|----
-|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/slide_m.gif)|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/slide_s.gif)|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/switch.gif)|
+|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/slide_m.gif)|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/slide_s.gif)|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/switch_.gif)|
 
 
 |BannerSwitch(单条)|BannerSwitch(多条)|BannerSwitch(自由)|
@@ -67,7 +67,7 @@ dependencies {
 ### how to use  BannerSwitch
 
      
-     配置ListAdapter 或者 直接布局
+       配置ListAdapter 或者 直接布局
        <com.powyin.slide.widget.BannerSwitch
             android:layout_width="match_parent"
             android:layout_height="match_parent"
