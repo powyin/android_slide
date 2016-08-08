@@ -221,7 +221,7 @@ public class PowSwitch extends View {
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchSlop / 1.5f) {
+                if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchSlop) {
                     ensureTargetClick();
                 }
             case MotionEvent.ACTION_CANCEL:
@@ -275,7 +275,7 @@ public class PowSwitch extends View {
     }
 
 
-    public void ensureTarget(boolean forceReverse) {
+    private void ensureTarget(boolean forceReverse) {
         final int animationTarget;
 
         if (forceReverse) {
@@ -312,12 +312,19 @@ public class PowSwitch extends View {
     }
 
 
-    public void ensureTargetClick() {
+    private void ensureTargetClick() {
         if (mInitialMotionX < getWidth() / 2 && targetCurrent > targetMax / 2) {
             ensureTarget(true);
         } else if (mInitialMotionX > getWidth() / 2 && targetCurrent < targetMax / 2) {
             ensureTarget(true);
         }
+
+    }
+
+    //---------------------------------------------setting----------------------------------------------//
+
+    public void setToggle(boolean toggle){
+
 
     }
 

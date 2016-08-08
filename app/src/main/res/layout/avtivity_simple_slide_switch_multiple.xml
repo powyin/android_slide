@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:pow_show_over_scroll="true"
+        app:pow_checked_hei="@drawable/a"
         >
 
         <TextView
