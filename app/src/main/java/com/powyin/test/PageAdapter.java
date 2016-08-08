@@ -10,9 +10,11 @@ import com.powyin.test.wt.FragmentImage;
  * Created by powyin on 2016/8/3.
  */
 public class PageAdapter extends FragmentPagerAdapter {
+    private int count;
 
-    public PageAdapter(FragmentManager fm) {
+    public PageAdapter(FragmentManager fm, int count) {
         super(fm);
+        this.count = count;
     }
 
     @Override
@@ -23,6 +25,6 @@ public class PageAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 6;
+        return count;
     }
 }

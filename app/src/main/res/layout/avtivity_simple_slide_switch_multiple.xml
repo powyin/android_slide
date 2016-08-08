@@ -10,72 +10,126 @@
         android:id="@+id/test_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:pow_fixed_item="3"
         app:pow_show_over_scroll="true"
         >
 
         <TextView
             android:background="#6f00ff00"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:layout_height="40dp"
             android:minWidth="70dp"
+            android:textSize="14sp"
             android:text="音乐"
+            android:textColor="#ff656565"
             android:gravity="center" />
 
         <TextView
             android:background="#7700bbff"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:layout_height="40dp"
             android:minWidth="70dp"
+            android:textSize="14sp"
             android:text="视频"
+            android:textColor="#ff656565"
             android:gravity="center"/>
 
         <TextView
             android:background="#6c8c00ff"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:layout_height="40dp"
             android:minWidth="70dp"
+            android:textSize="14sp"
             android:text="教育"
+            android:textColor="#ff656565"
             android:gravity="center"/>
 
         <TextView
             android:background="#6c00ff51"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:layout_height="40dp"
             android:minWidth="70dp"
+            android:textSize="14sp"
             android:text="娱乐"
+            android:textColor="#ff656565"
             android:gravity="center" />
 
         <TextView
-            android:background="#6c0026ff"
+            android:background="#6c8c00ff"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
+            android:layout_height="40dp"
             android:minWidth="70dp"
-            android:text="international"
-            android:gravity="center" />
+            android:textSize="14sp"
+            android:text="可乐"
+            android:textColor="#ff656565"
+            android:gravity="center"/>
 
+        <TextView
+            android:background="#6cffbf00"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:minWidth="70dp"
+            android:textSize="14sp"
+            android:text="流行"
+            android:textColor="#ff656565"
+            android:gravity="center"/>
+
+        <TextView
+            android:background="#6cf5757a"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:minWidth="70dp"
+            android:textSize="14sp"
+            android:text="奥运"
+            android:textColor="#ff656565"
+            android:gravity="center"/>
+
+        <TextView
+            android:background="#6c8cff00"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:minWidth="70dp"
+            android:textSize="14sp"
+            android:text="礼乐"
+            android:textColor="#ff656565"
+            android:gravity="center"/>
+
+        <TextView
+            android:background="#6cd500ff"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:minWidth="70dp"
+            android:textSize="14sp"
+            android:text="国足"
+            android:textColor="#ff656565"
+            android:gravity="center"/>
+
+        <TextView
+            android:background="#6cff22ed"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:minWidth="70dp"
+            android:textSize="14sp"
+            android:text="美食"
+            android:textColor="#ff656565"
+            android:gravity="center"/>
         <TextView
             android:background="#6cff006f"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:layout_height="40dp"
             android:minWidth="70dp"
+            android:textSize="14sp"
             android:text="笑话"
+            android:textColor="#ff656565"
             android:gravity="center"  />
 
         <TextView
             android:background="#6c008cff"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:layout_height="40dp"
             android:minWidth="70dp"
+            android:textSize="14sp"
             android:text="谐星"
+            android:textColor="#ff656565"
             android:gravity="center"  />
 
 
@@ -90,7 +144,46 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <TextView
+            android:id="@+id/click_reset_adapter"
+            android:text="替换Adapter"
+            android:gravity="center"
+            android:background="#6abcff"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:onClick="onClick"
+            />
+        <TextView
+            android:id="@+id/click_add_item"
+            android:text="增加一项数据"
+            android:gravity="center"
+            android:background="#f5ff6a"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:onClick="onClick"
+            />
+        <TextView
+            android:id="@+id/click_remove_item"
+            android:text="减少一项数据"
+            android:gravity="center"
+            android:background="#ff6a6f"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:onClick="onClick"
+            />
+
+    </LinearLayout>
 
 </LinearLayout>
 

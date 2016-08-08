@@ -49,34 +49,34 @@ public class PowSwitch extends View {
         super(context, attrs, defStyleAttr);
 
         float density = context.getResources().getDisplayMetrics().density;
-        mSwitchSuggestWei = (int)(36*density);
-        mSwitchSuggestHei = (int)(16*density);
+        mSwitchSuggestWei = (int) (36 * density);
+        mSwitchSuggestHei = (int) (16 * density);
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PowSwitch);
 
         mSwitchBacOff = a.getDrawable(R.styleable.PowSwitch_pow_switch_bac_off);
-        if(mSwitchBacOff==null){
+        if (mSwitchBacOff == null) {
             mSwitchBacOff = context.getResources().getDrawable(R.drawable.powyin_switch_pow_switch_bac_off);
         }
         mSwitchBacOn = a.getDrawable(R.styleable.PowSwitch_pow_switch_bac_on);
-        if(mSwitchBacOn==null){
+        if (mSwitchBacOn == null) {
             mSwitchBacOn = context.getResources().getDrawable(R.drawable.powyin_switch_pow_switch_bac_on);
         }
         mSwitchIconOff = a.getDrawable(R.styleable.PowSwitch_pow_switch_icon_off);
-        if(mSwitchIconOff==null){
+        if (mSwitchIconOff == null) {
             mSwitchIconOff = context.getResources().getDrawable(R.drawable.powyin_switch_pow_switch_icon_off);
         }
         mSwitchIconOn = a.getDrawable(R.styleable.PowSwitch_pow_switch_icon_on);
-        if(mSwitchIconOn==null){
+        if (mSwitchIconOn == null) {
             mSwitchIconOn = context.getResources().getDrawable(R.drawable.powyin_switch_pow_switch_icon_on);
         }
 
-        mSwitchPadding = (int)(a.getDimension(R.styleable.PowSwitch_pow_switch_padding,(int)(2*density))+0.5f);
+        mSwitchPadding = (int) (a.getDimension(R.styleable.PowSwitch_pow_switch_padding, (int) (2 * density)) + 0.5f);
 
         a.recycle();
 
 
-        mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(ViewConfiguration.get(context))/2;
+        mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(ViewConfiguration.get(context)) / 2;
 
     }
 
@@ -92,27 +92,27 @@ public class PowSwitch extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
         int maxWei = 0;
-        maxWei = Math.max(maxWei,mSwitchBacOff.getIntrinsicWidth());
-        maxWei = Math.max(maxWei,mSwitchBacOn.getIntrinsicWidth());
-        maxWei = Math.max(maxWei,mSwitchIconOff.getIntrinsicWidth()+2*mSwitchPadding);
-        maxWei = Math.max(maxWei,mSwitchIconOn.getIntrinsicWidth()+2*mSwitchPadding);
-        maxWei+=getPaddingLeft()+getPaddingRight();
+        maxWei = Math.max(maxWei, mSwitchBacOff.getIntrinsicWidth());
+        maxWei = Math.max(maxWei, mSwitchBacOn.getIntrinsicWidth());
+        maxWei = Math.max(maxWei, mSwitchIconOff.getIntrinsicWidth() + 2 * mSwitchPadding);
+        maxWei = Math.max(maxWei, mSwitchIconOn.getIntrinsicWidth() + 2 * mSwitchPadding);
+        maxWei += getPaddingLeft() + getPaddingRight();
 
         int maxHei = 0;
-        maxHei = Math.max(maxHei,mSwitchBacOff.getIntrinsicHeight());
-        maxHei = Math.max(maxHei,mSwitchBacOn.getIntrinsicHeight());
-        maxHei = Math.max(maxHei,mSwitchIconOff.getIntrinsicHeight()+2*mSwitchPadding);
-        maxHei = Math.max(maxHei,mSwitchIconOn.getIntrinsicHeight()+2*mSwitchPadding);
-        maxHei += getPaddingTop()+getPaddingBottom();
+        maxHei = Math.max(maxHei, mSwitchBacOff.getIntrinsicHeight());
+        maxHei = Math.max(maxHei, mSwitchBacOn.getIntrinsicHeight());
+        maxHei = Math.max(maxHei, mSwitchIconOff.getIntrinsicHeight() + 2 * mSwitchPadding);
+        maxHei = Math.max(maxHei, mSwitchIconOn.getIntrinsicHeight() + 2 * mSwitchPadding);
+        maxHei += getPaddingTop() + getPaddingBottom();
 
 
-        int minWei = 2*mSwitchPadding+getPaddingTop()+getPaddingBottom();
-        int minHei = 2*mSwitchPadding+getPaddingLeft()+getPaddingRight();
+        int minWei = 2 * mSwitchPadding + getPaddingTop() + getPaddingBottom();
+        int minHei = 2 * mSwitchPadding + getPaddingLeft() + getPaddingRight();
 
-        if(maxWei<=minHei) maxWei = mSwitchSuggestWei + minWei;
-        if(maxHei<=minHei) maxHei = mSwitchSuggestHei + minHei;
+        if (maxWei <= minHei) maxWei = mSwitchSuggestWei + minWei;
+        if (maxHei <= minHei) maxHei = mSwitchSuggestHei + minHei;
 
-        setMeasuredDimension(resolveSize(maxWei,widthMeasureSpec),resolveSize(maxHei,heightMeasureSpec));
+        setMeasuredDimension(resolveSize(maxWei, widthMeasureSpec), resolveSize(maxHei, heightMeasureSpec));
     }
 
     @Override
@@ -121,27 +121,27 @@ public class PowSwitch extends View {
         initSize();
     }
 
-    private void initSize(){
+    private void initSize() {
         bacRect.left = getPaddingLeft();
-        bacRect.right = getWidth()-getPaddingRight();
+        bacRect.right = getWidth() - getPaddingRight();
         bacRect.top = getPaddingTop();
-        bacRect.bottom = getHeight()-getPaddingBottom();
+        bacRect.bottom = getHeight() - getPaddingBottom();
 
-        iconRect.top = iconFixedRect.top=getPaddingTop()+mSwitchPadding;
-        iconRect.bottom = iconFixedRect.bottom = getHeight()-getPaddingBottom()-mSwitchPadding;
+        iconRect.top = iconFixedRect.top = getPaddingTop() + mSwitchPadding;
+        iconRect.bottom = iconFixedRect.bottom = getHeight() - getPaddingBottom() - mSwitchPadding;
 
-        int maxWid = Math.max(0,Math.max(mSwitchIconOff.getIntrinsicWidth(),mSwitchIconOn.getIntrinsicWidth()));
-        int maxHei = Math.max(0,Math.max(mSwitchIconOff.getIntrinsicHeight(),mSwitchIconOn.getIntrinsicHeight()));
+        int maxWid = Math.max(0, Math.max(mSwitchIconOff.getIntrinsicWidth(), mSwitchIconOn.getIntrinsicWidth()));
+        int maxHei = Math.max(0, Math.max(mSwitchIconOff.getIntrinsicHeight(), mSwitchIconOn.getIntrinsicHeight()));
 
-        iconFixedRect.left = getPaddingLeft()+mSwitchPadding ;
-        if(maxHei!=0&&maxWid!=0){
-            iconFixedRect.right=iconFixedRect.left+(int)(1f*maxWid/maxHei*(iconFixedRect.bottom-iconFixedRect.top));
-        }else {
-            iconFixedRect.right = iconFixedRect.left+iconFixedRect.bottom-iconFixedRect.top;
+        iconFixedRect.left = getPaddingLeft() + mSwitchPadding;
+        if (maxHei != 0 && maxWid != 0) {
+            iconFixedRect.right = iconFixedRect.left + (int) (1f * maxWid / maxHei * (iconFixedRect.bottom - iconFixedRect.top));
+        } else {
+            iconFixedRect.right = iconFixedRect.left + iconFixedRect.bottom - iconFixedRect.top;
         }
 
-        targetMax = getWidth()-getPaddingRight()-getPaddingLeft()-2*mSwitchPadding-iconFixedRect.right+iconFixedRect.left;
-        targetMax = Math.max(targetMax,0);
+        targetMax = getWidth() - getPaddingRight() - getPaddingLeft() - 2 * mSwitchPadding - iconFixedRect.right + iconFixedRect.left;
+        targetMax = Math.max(targetMax, 0);
 
         targetCurrent = 0;
         targetCurrent = 0;
@@ -155,28 +155,27 @@ public class PowSwitch extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        float radio = targetMax>0 ? 1f*targetCurrent/targetMax : 0;
-        radio = Math.min(1,radio);
-        radio = Math.max(0,radio);
+        float radio = targetMax > 0 ? 1f * targetCurrent / targetMax : 0;
+        radio = Math.min(1, radio);
+        radio = Math.max(0, radio);
 
-        mSwitchBacOff.setAlpha((int)(255*(1-radio)));
+        mSwitchBacOff.setAlpha((int) (255 * (1 - radio)));
         mSwitchBacOff.draw(canvas);
 
-        mSwitchBacOn.setAlpha((int)(255*radio));
+        mSwitchBacOn.setAlpha((int) (255 * radio));
         mSwitchBacOn.draw(canvas);
 
-        iconRect.left = iconFixedRect.left+targetCurrent;
-        iconRect.right = iconFixedRect.right+targetCurrent;
+        iconRect.left = iconFixedRect.left + targetCurrent;
+        iconRect.right = iconFixedRect.right + targetCurrent;
 
-        mSwitchIconOff.setAlpha((int)(255*(1-radio)));
+        mSwitchIconOff.setAlpha((int) (255 * (1 - radio)));
         mSwitchIconOff.setBounds(iconRect);
         mSwitchIconOff.draw(canvas);
 
-        mSwitchIconOn.setAlpha((int)(255*radio));
+        mSwitchIconOn.setAlpha((int) (255 * radio));
         mSwitchIconOn.setBounds(iconRect);
         mSwitchIconOn.draw(canvas);
     }
-
 
 
     @Override
@@ -246,8 +245,8 @@ public class PowSwitch extends View {
                 break;
         }
 
-        if(mIsBeingDragged){
-            if(getParent()!=null){
+        if (mIsBeingDragged) {
+            if (getParent() != null) {
                 getParent().requestDisallowInterceptTouchEvent(true);
             }
         }
@@ -258,9 +257,9 @@ public class PowSwitch extends View {
     private void offsetSwitch(float x) {
         float deltaX = mLastMotionX - x;
         mLastMotionX = x;
-        targetCurrent-=deltaX;
-        targetCurrent = Math.min(targetMax,targetCurrent);
-        targetCurrent = Math.max(0,targetCurrent);
+        targetCurrent -= deltaX;
+        targetCurrent = Math.min(targetMax, targetCurrent);
+        targetCurrent = Math.max(0, targetCurrent);
         invalidate();
     }
 
@@ -276,29 +275,29 @@ public class PowSwitch extends View {
     }
 
 
-    public void ensureTarget( boolean forceReverse) {
+    public void ensureTarget(boolean forceReverse) {
         final int animationTarget;
 
-        if(forceReverse){
-            if(targetCurrent>targetMax/2){
+        if (forceReverse) {
+            if (targetCurrent > targetMax / 2) {
                 animationTarget = 0;
-            }else {
+            } else {
                 animationTarget = targetMax;
             }
-        }else {
-            if(targetCurrent>targetMax/2){
+        } else {
+            if (targetCurrent > targetMax / 2) {
                 animationTarget = targetMax;
-            }else {
+            } else {
                 animationTarget = 0;
             }
         }
 
 
-        if(animationTarget==targetCurrent || targetMax==0) return;
+        if (animationTarget == targetCurrent || targetMax == 0) return;
 
-        if(valueAnimator!=null) valueAnimator.cancel();
+        if (valueAnimator != null) valueAnimator.cancel();
 
-        valueAnimator = ValueAnimator.ofInt(targetCurrent,animationTarget);
+        valueAnimator = ValueAnimator.ofInt(targetCurrent, animationTarget);
 
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -308,15 +307,15 @@ public class PowSwitch extends View {
             }
         });
 
-        valueAnimator.setDuration((int)Math.abs(450f*(animationTarget-targetCurrent)/targetMax));
+        valueAnimator.setDuration((int) Math.abs(450f * (animationTarget - targetCurrent) / targetMax));
         valueAnimator.start();
     }
 
 
-    public void ensureTargetClick(){
-        if(mInitialMotionX<getWidth()/2 && targetCurrent> targetMax/2){
+    public void ensureTargetClick() {
+        if (mInitialMotionX < getWidth() / 2 && targetCurrent > targetMax / 2) {
             ensureTarget(true);
-        }else if(mInitialMotionX>getWidth()/2 && targetCurrent<targetMax/2){
+        } else if (mInitialMotionX > getWidth() / 2 && targetCurrent < targetMax / 2) {
             ensureTarget(true);
         }
 

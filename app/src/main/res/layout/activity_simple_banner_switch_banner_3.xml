@@ -133,12 +133,58 @@
     </FrameLayout>
 
 
-    <TextView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="自动循环\napp:pow_switch_fixed_item= 3"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="100dp"
+            android:gravity="center"
+            android:text="自动循环\n支持ListAdapter\napp:pow_switch_fixed_item= 3"
+            />
 
-        />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+            <TextView
+                android:id="@+id/click_reset_adapter"
+                android:text="替换Adapter"
+                android:gravity="center"
+                android:background="#6abcff"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:onClick="onClick"
+                />
+            <TextView
+                android:id="@+id/click_add_item"
+                android:text="增加一项数据"
+                android:gravity="center"
+                android:background="#f5ff6a"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:onClick="onClick"
+                />
+            <TextView
+                android:id="@+id/click_remove_item"
+                android:text="减少一项数据"
+                android:gravity="center"
+                android:background="#ff6a6f"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:onClick="onClick"
+                />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+
 
 </LinearLayout>

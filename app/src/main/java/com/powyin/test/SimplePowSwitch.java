@@ -17,7 +17,7 @@ public class SimplePowSwitch extends Activity {
         ViewPager viewPager;
     }
 
-    public void onClick(View view){
+    public void onClick(View view) {
 
     }
 }

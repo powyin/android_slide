@@ -36,9 +36,9 @@ public class FragmentImage extends Fragment {
 
     View view;
 
-    public static FragmentImage getNewInstance(int postion){
+    public static FragmentImage getNewInstance(int postion) {
         Bundle bundle = new Bundle();
-        bundle.putInt("key",postion);
+        bundle.putInt("key", postion);
         FragmentImage image = new FragmentImage();
         image.setArguments(bundle);
         return image;
@@ -49,7 +49,7 @@ public class FragmentImage extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_new, container, false);
-        ((TextView)view.findViewById(R.id.text)).setText(String.valueOf(getArguments().getInt("key")));
+        ((TextView) view.findViewById(R.id.text)).setText(String.valueOf(getArguments().getInt("key")));
         return view;
     }
 
@@ -57,25 +57,6 @@ public class FragmentImage extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

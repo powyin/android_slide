@@ -14,25 +14,25 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onClick(View view){
-        switch (view.getId()){
+    public void onClick(View view) {
+        switch (view.getId()) {
             case R.id.click_to_slide_switch_single:
-                startActivity(new Intent(this,SimpleSlideSwitchSingle.class));
+                startActivity(new Intent(this, SimpleSlideSwitchSingle.class));
                 break;
             case R.id.click_to_slide_switch_multiple:
-                startActivity(new Intent(this,SimpleSlideSwitchMultiple.class));
+                startActivity(new Intent(this, SimpleSlideSwitchMultiple.class));
                 break;
             case R.id.click_to_banner_1:
-                startActivity(new Intent(this,SimpleBannerSwitch_Banner_1.class));
+                startActivity(new Intent(this, SimpleBannerSwitch_Banner_1.class));
                 break;
             case R.id.click_to_banner_3:
-                startActivity(new Intent(this,SimpleBannerSwitch_Banner_3.class));
+                startActivity(new Intent(this, SimpleBannerSwitch_Banner_3.class));
                 break;
             case R.id.click_to_banner_no:
-                startActivity(new Intent(this,SimpleBannerSwitch_No_Auto.class));
+                startActivity(new Intent(this, SimpleBannerSwitch_No_Auto.class));
                 break;
             case R.id.click_to_pow_switch:
-                startActivity(new Intent(this,SimplePowSwitch.class));
+                startActivity(new Intent(this, SimplePowSwitch.class));
                 break;
         }
 

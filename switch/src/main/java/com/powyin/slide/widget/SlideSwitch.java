@@ -27,7 +27,9 @@ import android.widget.Scroller;
 import com.powyin.slide.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by powyin on 2016/8/2.
@@ -61,14 +63,25 @@ public class SlideSwitch extends ViewGroup {
     private OnItemClickListener mOnItemClickListener;
     private OnButtonLineScrollListener mOnButtonLineScrollListener;
     private ListAdapter mListAdapter;
+    Map<Integer, TypeViewInfo> mTypeToView = new HashMap<>();
 
     private final DataSetObserver mDataSetObserver = new DataSetObserver() {
         @Override
         public void onChanged() {
-            super.onChanged();
+            refreshAdapter();
         }
 
     };
+
+    private class TypeViewInfo {
+        Integer mType;
+        List<View> holdViews = new ArrayList<>();
+        int currentUsedPosition;
+
+        TypeViewInfo(Integer type) {
+            this.mType = type;
+        }
+    }
 
     public SlideSwitch(Context context) {
         this(context, null, 0);
@@ -81,6 +94,8 @@ public class SlideSwitch extends ViewGroup {
     public SlideSwitch(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
+        float density = context.getResources().getDisplayMetrics().density;
+
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SlideSwitch);
         mSelectDrawable = a.getDrawable(R.styleable.SlideSwitch_pow_checked_drawable);
         if (mSelectDrawable == null) {
@@ -90,7 +105,7 @@ public class SlideSwitch extends ViewGroup {
         if (mSelectDrawableBac == null) {
             mSelectDrawableBac = context.getResources().getDrawable(R.drawable.powyin_switch_slide_switch_select_bac);
         }
-        mSelectHei = a.getInt(R.styleable.SlideSwitch_pow_checked_hei, 8);
+        mSelectHei = a.getInt(R.styleable.SlideSwitch_pow_checked_hei, (int)(3.5*density));
         mSelectMaxItem = a.getInt(R.styleable.SlideSwitch_pow_fixed_item, -1);
         mSelectShowOverScroll = a.getBoolean(R.styleable.SlideSwitch_pow_show_over_scroll, false);
         a.recycle();
@@ -112,7 +127,7 @@ public class SlideSwitch extends ViewGroup {
         mMatchParentChildren.clear();
         int maxHeight = 0;
         int maxWidth = 0;
-        if (mSelectMaxItem<=0) {
+        if (mSelectMaxItem <= 0) {
             for (int i = 0; i < count; i++) {
                 final View child = getChildAt(i);
                 measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, mSelectHei);
@@ -152,8 +167,8 @@ public class SlideSwitch extends ViewGroup {
 
         } else {
             int widthMeasure = MeasureSpec.getSize(widthMeasureSpec);
-            float pace = (1f / (mSelectMaxItem) * (widthMeasure - getPaddingLeft() - getPaddingRight())) ;
-            int speWidthMeasure =  MeasureSpec.makeMeasureSpec((int)pace, MeasureSpec.EXACTLY) ;
+            float pace = (1f / (mSelectMaxItem) * (widthMeasure - getPaddingLeft() - getPaddingRight()));
+            int speWidthMeasure = MeasureSpec.makeMeasureSpec((int) pace, MeasureSpec.EXACTLY);
             int usedHei = getPaddingTop() + getPaddingBottom() + mSelectHei;
             for (int i = 0; i < count; i++) {
                 final View child = getChildAt(i);
@@ -193,7 +208,7 @@ public class SlideSwitch extends ViewGroup {
         int childTop = getPaddingTop();
         int childLeft = getPaddingLeft();
         final int count = getChildCount();
-        if (mSelectMaxItem<=0) {
+        if (mSelectMaxItem <= 0) {
             for (int i = 0; i < count; i++) {
                 View child = getChildAt(i);
                 int childWidth = child.getMeasuredWidth();
@@ -214,9 +229,9 @@ public class SlideSwitch extends ViewGroup {
                 int childHeight = child.getMeasuredHeight();
                 LayoutParams lp =
                         (LayoutParams) child.getLayoutParams();
-                child.layout(paddingLeft + (int)(i * pace) + lp.leftMargin, childTop, paddingLeft + (int)((i+1) * pace) - lp.rightMargin, childHeight + childTop);
+                child.layout(paddingLeft + (int) (i * pace) + lp.leftMargin, childTop, paddingLeft + (int) ((i + 1) * pace) - lp.rightMargin, childHeight + childTop);
             }
-            mMaxWid =Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), (int)(pace*(count)));
+            mMaxWid = Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), (int) (pace * (count)));
         }
         calculationRect(true);
     }
@@ -250,7 +265,7 @@ public class SlideSwitch extends ViewGroup {
             mIsMultipleFinger = false;
         }
 
-        if(action == MotionEvent.ACTION_POINTER_DOWN){
+        if (action == MotionEvent.ACTION_POINTER_DOWN) {
             mIsMultipleFinger = true;
         }
 
@@ -486,7 +501,7 @@ public class SlideSwitch extends ViewGroup {
         int maxScroll = mMaxWid + getPaddingLeft() + getPaddingRight() - getWidth();
         if (!mSelectShowOverScroll) {
             scrollX = Math.min(Math.max(scrollX, 0), maxScroll);
-        }else if (scrollX < 0) {
+        } else if (scrollX < 0) {
             //加入滑动阻尼系数
             int maxLen = getWidth() / 3;
             deltaX = (float) Math.pow(1f * Math.max(0, maxLen + scrollX) / maxLen, 3) * deltaX;
@@ -543,8 +558,8 @@ public class SlideSwitch extends ViewGroup {
             int startScrollX = getScrollX();
             int endScrollX = Math.min(Math.max(temTargetX, 0), mMaxWid + getPaddingLeft() + getPaddingRight() - getWidth());
 
-            PropertyValuesHolder valuesHolderScrollX = PropertyValuesHolder.ofInt("scrollX",startScrollX,endScrollX);
-            PropertyValuesHolder valuesHolderSelectIndex = PropertyValuesHolder.ofFloat("scrollRadio",mSelectIndex,targetIndex);
+            PropertyValuesHolder valuesHolderScrollX = PropertyValuesHolder.ofInt("scrollX", startScrollX, endScrollX);
+            PropertyValuesHolder valuesHolderSelectIndex = PropertyValuesHolder.ofFloat("scrollRadio", mSelectIndex, targetIndex);
 
             valueAnimator = ValueAnimator.ofPropertyValuesHolder(valuesHolderScrollX, valuesHolderSelectIndex);
             valueAnimator.setDuration(150 + (int) (250 * Math.abs((targetIndex - mSelectIndex) * 1f / getChildCount())));
@@ -552,10 +567,7 @@ public class SlideSwitch extends ViewGroup {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
 
-                    int left = mSelectDrawableRect.left;
-                    int right = mSelectDrawableRect.right;
-
-                    int mScrollX = (int)  animation.getAnimatedValue("scrollX");
+                    int mScrollX = (int) animation.getAnimatedValue("scrollX");
                     mSelectIndex = (float) animation.getAnimatedValue("scrollRadio");
 
                     if (getScrollX() != mScrollX) {
@@ -563,12 +575,6 @@ public class SlideSwitch extends ViewGroup {
                     }
 
                     calculationRect(false);
-                    if (left != mSelectDrawableRect.left || right != mSelectDrawableRect.right) {
-                        if (mOnButtonLineScrollListener != null) {
-                            mOnButtonLineScrollListener.onButtonLineScroll(mSelectIndex,getChildCount());
-                        }
-                        ViewCompat.postInvalidateOnAnimation(SlideSwitch.this);
-                    }
 
                 }
             });
@@ -579,19 +585,34 @@ public class SlideSwitch extends ViewGroup {
     // 动态计算位置；
     private void calculationRect(boolean reSizeBound) {
         if (mSelectDrawable != null && mSelectIndex >= 0 && mSelectIndex + 1 <= getChildCount()) {
-            View originView = getChildAt((int) mSelectIndex);
-            View targetView = getChildAt((int) (mSelectIndex + 1));
+
+            int count = getChildCount();
+            int locLeft = (int) mSelectIndex;
+            int locRight = locLeft + 1;
+            float diff = mSelectIndex - locLeft;
+
+            View originView = getChildAt(locLeft);
+            View targetView = getChildAt(locRight);
 
             int c_left = targetView != null ? targetView.getLeft() - originView.getLeft() : 0;
             int c_right = targetView != null ? targetView.getRight() - originView.getRight() : 0;
 
-            float radio = mSelectIndex - (int) mSelectIndex;
+            int oldLeft = mSelectDrawableRect.left;
+            int oldRight = mSelectDrawableRect.right;
 
-            //根据选择的位置实例化一个View，然后画
             mSelectDrawableRect.top = getHeight() - getPaddingBottom() - mSelectHei;
             mSelectDrawableRect.bottom = mSelectDrawableRect.top + mSelectHei;
-            mSelectDrawableRect.left = (int) ((originView.getLeft() + c_left * radio));
-            mSelectDrawableRect.right = (int) ((originView.getRight()) + c_right * radio);
+            mSelectDrawableRect.left = (int) ((originView.getLeft() + c_left * diff));
+            mSelectDrawableRect.right = (int) ((originView.getRight()) + c_right * diff);
+
+            if (oldLeft != mSelectDrawableRect.left || oldRight != mSelectDrawableRect.right) {
+                if (mOnButtonLineScrollListener != null) {
+                    mOnButtonLineScrollListener.onButtonLineScroll(
+                            count, locLeft, locRight, getChildAt(locLeft), getChildAt(locRight), 1 - diff, diff);
+                }
+                ViewCompat.postInvalidateOnAnimation(SlideSwitch.this);
+            }
+            //-------------------
         }
         if (reSizeBound) {
             mSelectDrawablePath.reset();
@@ -621,16 +642,12 @@ public class SlideSwitch extends ViewGroup {
                 mIsJustBegin = false;
             }
 
-            int left = mSelectDrawableRect.left;
-            int right = mSelectDrawableRect.right;
             mSelectIndex = position + positionOffset;
+
+            mSelectIndex = Math.min(mSelectIndex, getChildCount() - 1);
+            mSelectIndex = Math.max(mSelectIndex, 0);
+
             calculationRect(false);
-            if (left != mSelectDrawableRect.left || right != mSelectDrawableRect.right) {
-                if (mOnButtonLineScrollListener != null) {
-                    mOnButtonLineScrollListener.onButtonLineScroll(mSelectIndex,getChildCount());
-                }
-                ViewCompat.postInvalidateOnAnimation(SlideSwitch.this);
-            }
 
             int targetScrollX = getScrollXByFloatWei(mSelectIndex);
             float diff = Math.abs(mSelectIndex - mFixedPosition) > 0.5f ? 1 : Math.min(Math.abs((mSelectIndex - mFixedPosition) * 2), 1);
@@ -698,9 +715,65 @@ public class SlideSwitch extends ViewGroup {
         return (int) ((endScrollX - startScrollX) * positionOffset + startScrollX);
     }
 
-    private void  computeAdapter(){
-        removeAllViews();
 
+    // 刷新Adapter
+    private void refreshAdapter() {
+        removeAllViews();
+        for (TypeViewInfo info : mTypeToView.values()) {
+            info.currentUsedPosition = 0;
+        }
+        int count = mListAdapter != null ? mListAdapter.getCount() : 0;
+        for (int i = 0; i < count; i++) {
+            Integer type = mListAdapter.getItemViewType(i);
+            if (!mTypeToView.containsKey(type)) {
+                mTypeToView.put(type, new TypeViewInfo(type));
+            }
+            TypeViewInfo info = mTypeToView.get(type);
+            View canvasView = info.currentUsedPosition < info.holdViews.size() ? info.holdViews.get(info.currentUsedPosition) : null;
+            View current = mListAdapter.getView(i, canvasView, this);
+            if (current == null)
+                throw new RuntimeException("Adapter.getView(postion , convasView, viewParent) cannot be null ");
+            if (canvasView != current) {
+                if (canvasView == null) {
+                    info.holdViews.add(current);
+                } else {
+                    info.holdViews.remove(canvasView);
+                    info.holdViews.add(info.currentUsedPosition, current);
+                }
+            }
+            info.currentUsedPosition++;
+            addView(current);
+        }
+
+        mSelectIndex = Math.min(mSelectIndex, count - 1);
+        mSelectIndex = Math.max(0, mSelectIndex);
+        calculationRect(true);
+    }
+
+    // 载入Adapter
+    private void computeAdapter() {
+        mTypeToView.clear();
+        removeAllViews();
+        if (mListAdapter == null || mListAdapter.getCount() == 0) return;
+        int count = mListAdapter.getCount();
+        for (int i = 0; i < count; i++) {
+            Integer type = mListAdapter.getItemViewType(i);
+            if (!mTypeToView.containsKey(type)) {
+                mTypeToView.put(type, new TypeViewInfo(type));
+            }
+            TypeViewInfo info = mTypeToView.get(type);
+
+            View current = mListAdapter.getView(i, null, this);
+            if (current == null)
+                throw new RuntimeException("Adapter.getView(postion , convasView, viewParent) cannot be null ");
+            info.holdViews.add(current);
+            info.currentUsedPosition++;
+            addView(current);
+        }
+
+        mSelectIndex = Math.min(mSelectIndex, count - 1);
+        mSelectIndex = Math.max(0, mSelectIndex);
+        calculationRect(true);
     }
 
 
@@ -754,25 +827,37 @@ public class SlideSwitch extends ViewGroup {
         return mViewPageChangeListener;
     }
 
-    public void setAdapter(ListAdapter adapter){
-        if(mListAdapter!=null){
+    public void setAdapter(ListAdapter adapter) {
+        if (mListAdapter == adapter) return;
+        if (mListAdapter != null) {
             mListAdapter.unregisterDataSetObserver(mDataSetObserver);
         }
-
         mListAdapter = adapter;
-        if(adapter!=null){
+        if (adapter != null) {
             adapter.registerDataSetObserver(mDataSetObserver);
         }
-
         computeAdapter();
-
     }
+
+    /**
+     * 设置选择项
+     * @param index
+     */
+    public void setSlectIndex(int index){
+        if(mSelectIndex!=index){
+            mSelectIndex = index;
+            mSelectIndex = Math.min(mSelectIndex, getChildCount() - 1);
+            mSelectIndex = Math.max(0, mSelectIndex);
+            calculationRect(false);
+        }
+    }
+
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.mOnItemClickListener = listener;
     }
 
-    public void setOnButtonLineScrollListener (OnButtonLineScrollListener listener){
+    public void setOnButtonLineScrollListener(OnButtonLineScrollListener listener) {
         this.mOnButtonLineScrollListener = listener;
     }
 
@@ -781,7 +866,16 @@ public class SlideSwitch extends ViewGroup {
     }
 
     public interface OnButtonLineScrollListener {
-        void onButtonLineScroll(float mScroll , int viewCount);
+        /**
+         * @param viewCount    当前View数量
+         * @param leftIndex    这边View 位置
+         * @param rightIndex   右边View 位置
+         * @param leftView     这边View
+         * @param rightView    右边View
+         * @param leftNearWei  中央位置接近 右边View 的尺度  0 表示远离； 1 表示重合
+         * @param rightNearWei 中央位置接近 右边View 的尺度  0 表示远离； 1 表示重合
+         */
+        void onButtonLineScroll(int viewCount, int leftIndex, int rightIndex, View leftView, View rightView, float leftNearWei, float rightNearWei);
     }
 
 }
