@@ -1,8 +1,8 @@
 
 
 
-## SlideSwitch 切换选项卡 可配合ViewPage使用 提供ListAdapter支持
-## BannerSwitch 轮播广告横幅  提供ListAdapter支持
+## SlideSwitch 切换选项卡 可配合ViewPage使用  支持ListAdapter配置
+## BannerSwitch 轮播广告横幅  支持ListAdapter配置
 ## PowSwitch 切换开关 
 
 
