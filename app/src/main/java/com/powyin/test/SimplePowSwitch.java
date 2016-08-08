@@ -14,7 +14,6 @@ public class SimplePowSwitch extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple_pow_switch);
-        ViewPager viewPager;
     }
 
     public void onClick(View view) {

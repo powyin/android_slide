@@ -7,16 +7,16 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewParent;
-import android.widget.Scroller;
 
 import com.powyin.slide.R;
+
+import java.lang.reflect.Method;
 
 /**
  * Created by powyin on 2016/8/4.
@@ -38,11 +38,13 @@ public class PowSwitch extends View {
     private int mSwitchPadding;
     private int mSwitchSuggestWei;
     private int mSwitchSuggestHei;
-    Rect iconRect = new Rect();
-    Rect iconFixedRect = new Rect();
-    Rect bacRect = new Rect();
-    int targetMax;
-    int targetCurrent;
+    private Rect iconRect = new Rect();
+    private Rect iconFixedRect = new Rect();
+    private Rect bacRect = new Rect();
+    private int targetMax;
+    private int targetCurrent;
+    private boolean mIsOpen;
+    private OnToggleListener mOnToggleListener;
 
 
     public PowSwitch(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -222,11 +224,26 @@ public class PowSwitch extends View {
                 break;
             case MotionEvent.ACTION_UP:
                 if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchSlop) {
-                    ensureTargetClick();
+                    if (mIsOpen && mInitialMotionX < getWidth() / 2) {
+                        mIsOpen = false;
+                        invokeListener();
+                        ensureTarget();
+                    } else if (!mIsOpen && mInitialMotionX > getWidth() / 2) {
+                        mIsOpen = true;
+                        invokeListener();
+                        ensureTarget();
+                    }
                 }
             case MotionEvent.ACTION_CANCEL:
                 if (mIsBeingDragged) {
-                    ensureTarget(false);
+                    if(mIsOpen && targetCurrent< targetMax/2){
+                        mIsOpen = false;
+                        invokeListener();
+                    }else if(!mIsOpen && targetCurrent>targetMax/2){
+                        mIsOpen = true;
+                        invokeListener();
+                    }
+                    ensureTarget();
                 }
                 mActivePointerId = INVALID_POINTER;
                 mIsBeingDragged = false;
@@ -275,25 +292,17 @@ public class PowSwitch extends View {
     }
 
 
-    private void ensureTarget(boolean forceReverse) {
+    private void ensureTarget() {
         final int animationTarget;
 
-        if (forceReverse) {
-            if (targetCurrent > targetMax / 2) {
-                animationTarget = 0;
-            } else {
-                animationTarget = targetMax;
-            }
-        } else {
-            if (targetCurrent > targetMax / 2) {
-                animationTarget = targetMax;
-            } else {
-                animationTarget = 0;
-            }
+        if(mIsOpen){
+            animationTarget = targetMax;
+        }else {
+            animationTarget = 0;
         }
 
+        if(animationTarget == targetCurrent || targetMax == 0) return;
 
-        if (animationTarget == targetCurrent || targetMax == 0) return;
 
         if (valueAnimator != null) valueAnimator.cancel();
 
@@ -307,25 +316,41 @@ public class PowSwitch extends View {
             }
         });
 
-        valueAnimator.setDuration((int) Math.abs(450f * (animationTarget - targetCurrent) / targetMax));
+        valueAnimator.setDuration(Math.max(50,(int) Math.abs(450f * (animationTarget - targetCurrent) / targetMax)));
         valueAnimator.start();
     }
 
 
-    private void ensureTargetClick() {
-        if (mInitialMotionX < getWidth() / 2 && targetCurrent > targetMax / 2) {
-            ensureTarget(true);
-        } else if (mInitialMotionX > getWidth() / 2 && targetCurrent < targetMax / 2) {
-            ensureTarget(true);
-        }
 
+    private void invokeListener(){
+        if(mOnToggleListener!=null){
+            mOnToggleListener.onToggle(mIsOpen);
+        }
     }
 
     //---------------------------------------------setting----------------------------------------------//
 
-    public void setToggle(boolean toggle){
+    // 设置开启
+    public void setOpen(boolean isOpen){
+        if(mIsOpen != isOpen){
+            mIsOpen = isOpen;
+            invokeListener();
+            ensureTarget();
+        }
+    }
+
+    // 是否开启
+    public boolean isOpen(){
+        return mIsOpen;
+    }
+
+    public void setOnToggleListener (OnToggleListener listener){
+        this.mOnToggleListener = listener;
+    }
 
 
+    public interface OnToggleListener{
+        void onToggle(boolean isOpen);
     }
 
 
