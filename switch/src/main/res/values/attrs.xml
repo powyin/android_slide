@@ -4,7 +4,7 @@
     <declare-styleable name="SlideSwitch">
         <attr name="pow_checked_drawable" format="reference"/>
         <attr name="pow_checked_bac" format="reference"/>
-        <attr name="pow_checked_hei" format="integer"/>
+        <attr name="pow_checked_hei" format="dimension"/>
         <attr name="pow_fixed_item" format="integer"/>
         <attr name="pow_show_over_scroll" format="boolean"/>
     </declare-styleable>

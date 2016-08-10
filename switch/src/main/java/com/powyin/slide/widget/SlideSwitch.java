@@ -105,7 +105,7 @@ public class SlideSwitch extends ViewGroup {
         if (mSelectDrawableBac == null) {
             mSelectDrawableBac = context.getResources().getDrawable(R.drawable.powyin_switch_slide_switch_select_bac);
         }
-        mSelectHei = a.getInt(R.styleable.SlideSwitch_pow_checked_hei, (int)(3.5*density));
+        mSelectHei = (int)a.getDimension(R.styleable.SlideSwitch_pow_checked_hei, (int)(3.5*density));
         mSelectMaxItem = a.getInt(R.styleable.SlideSwitch_pow_fixed_item, -1);
         mSelectShowOverScroll = a.getBoolean(R.styleable.SlideSwitch_pow_show_over_scroll, false);
         a.recycle();
