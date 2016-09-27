@@ -17,7 +17,7 @@ dependencies {
 
 |SlideSwitch(多项Item)|SlideSwitch(少量Item)|PowSwtch(开关)|
 |---|---|----
-|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/slide_m.gif)|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/slide_s.gif)|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/switch_.gif)|
+|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/slide_m.gif)|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/slide_s.gif)|![github](https://github.com/powyin/slide/blob/master/app/src/main/res/raw/slide_x.gif)|
 
 
 |BannerSwitch(单条)|BannerSwitch(多条)|BannerSwitch(自由)|
