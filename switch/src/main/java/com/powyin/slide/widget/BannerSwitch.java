@@ -106,16 +106,16 @@ public class BannerSwitch extends ViewGroup {
         super(context, attrs, defStyleAttr);
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BannerSwitch);
 
-        mSwitchFixedItem = a.getInt(R.styleable.BannerSwitch_pow_switch_fixed_item, 3);
+        mSwitchFixedItem = a.getInt(R.styleable.BannerSwitch_pow_switch_fixed_item, 1);
         mSwitchEnable = a.getBoolean(R.styleable.BannerSwitch_pow_switch_auto_ennable, true);
 
         mSwitchPagePeriod = a.getInt(R.styleable.BannerSwitch_pow_switch_period, 2550);
         mSwitchPagePeriod = Math.max(1500, mSwitchPagePeriod);
         mSwitchPagePeriod = Math.min(10000, mSwitchPagePeriod);
 
-        mSwitchAnimationPeriod = a.getInt(R.styleable.BannerSwitch_pow_switch_animation_period, 350);
+        mSwitchAnimationPeriod = a.getInt(R.styleable.BannerSwitch_pow_switch_animation_period, 550);
         mSwitchAnimationPeriod = Math.max(100, mSwitchAnimationPeriod);
-        mSwitchAnimationPeriod = Math.max(1000, mSwitchAnimationPeriod);
+        mSwitchAnimationPeriod = Math.min(1500, mSwitchAnimationPeriod);
 
         a.recycle();
         setScrollingCacheEnabled();
