@@ -122,7 +122,6 @@
                     android:textSize="15sp" />
             </FrameLayout>
 
-
         </com.powyin.slide.widget.BannerSwitch>
 
         <com.powyin.slide.widget.BannerUpperView

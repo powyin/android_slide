@@ -55,9 +55,23 @@ public class BannerUpperView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        float mDiver = 0.15f * w;
+        ensureConfig();
+
+    }
+
+    private void ensureConfig(){
+        int w = getWidth();
+        int h = getHeight();
+
+        float mDiver;
+        if(mViewCount<=7){
+            mDiver = w/2 - w*mViewCount*0.1f/2;
+        }else {
+            mDiver = 0.15f * w;
+        }
+
         mRectF.top = 0.93f * h;
-        mRectF.bottom = mRectF.top + Math.max(3, h * 0.01f);
+        mRectF.bottom = mRectF.top + Math.max(2, h * 0.007f);
         mRectF.left = mDiver;
         mRectF.right = w - mDiver;
         ensureUnSelectRect();
@@ -72,8 +86,8 @@ public class BannerUpperView extends View {
         float divide = (mRectF.right - mRectF.left) / mViewCount;
         for (int i = 0; i < mViewCount; i++) {
             RectF tem = new RectF();
-            tem.left = mRectF.left + divide / 12 + i * divide;
-            tem.right = mRectF.left - divide / 12 + i * divide + divide;
+            tem.left = mRectF.left + divide / 10 + i * divide;
+            tem.right = mRectF.left - divide / 10 + i * divide + divide;
             tem.top = mRectF.top;
             tem.bottom = mRectF.bottom;
             rectFListNo.add(tem);
@@ -124,7 +138,7 @@ public class BannerUpperView extends View {
 
         if (this.mViewCount != viewCount) {
             this.mViewCount = viewCount;
-            ensureUnSelectRect();
+            ensureConfig();
         }
 
         this.mLeftIndex = leftIndex;
