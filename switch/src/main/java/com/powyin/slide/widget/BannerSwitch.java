@@ -48,6 +48,7 @@ public class BannerSwitch extends ViewGroup {
     private AnimationRun autoProgress;
     private int mSwitchFixedItem;
     private boolean mSwitchEnable;
+    private boolean mSwitchEdge;
     private int mSwitchPagePeriod;
     private int mSwitchAnimationPeriod;
     private boolean mIsTouched;
@@ -108,10 +109,13 @@ public class BannerSwitch extends ViewGroup {
 
         mSwitchFixedItem = a.getInt(R.styleable.BannerSwitch_pow_switch_fixed_item, 1);
         mSwitchEnable = a.getBoolean(R.styleable.BannerSwitch_pow_switch_auto_ennable, true);
+        mSwitchEdge = a.getBoolean(R.styleable.BannerSwitch_pow_switch_fixed_edge, false);
+
 
         mSwitchPagePeriod = a.getInt(R.styleable.BannerSwitch_pow_switch_period, 2550);
         mSwitchPagePeriod = Math.max(1500, mSwitchPagePeriod);
         mSwitchPagePeriod = Math.min(10000, mSwitchPagePeriod);
+
 
         mSwitchAnimationPeriod = a.getInt(R.styleable.BannerSwitch_pow_switch_animation_period, 550);
         mSwitchAnimationPeriod = Math.max(100, mSwitchAnimationPeriod);
@@ -379,7 +383,7 @@ public class BannerSwitch extends ViewGroup {
         if (autoProgress != null) {
             autoProgress.isCancel = true;
         }
-        if (mSwitchEnable) {
+        if (mSwitchEnable && !mSwitchEdge) {
             autoProgress = new AnimationRun();
             postDelayed(autoProgress, (int) (mSwitchPagePeriod / 1.5f));
         }
@@ -447,6 +451,14 @@ public class BannerSwitch extends ViewGroup {
         float pace = Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), 0) / mSwitchFixedItem;
         if (pace <= 0) return;
         mSelectIndex -= deltaX / pace;
+
+        if (mSwitchEdge) {
+            mSelectIndex = Math.min(0, mSelectIndex);
+            mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
+        }
+
+        System.out.println("info   ---    " + mSelectIndex);
+
         ensureTranslationOrder();
     }
 
@@ -487,7 +499,14 @@ public class BannerSwitch extends ViewGroup {
                 public void onAnimationUpdate(ValueAnimator animation) {
                     if (mScroller.computeScrollOffset()) {
                         float pace = Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), 0) / mSwitchFixedItem;
+
                         mSelectIndex = startSelectIndex + mScroller.getCurrX() / pace;
+
+                        if (mSwitchEdge) {
+                            mSelectIndex = Math.min(0, mSelectIndex);
+                            mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
+                        }
+
                         ensureTranslationOrder();
                     } else {
                         animation.cancel();
@@ -528,6 +547,12 @@ public class BannerSwitch extends ViewGroup {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
                     mSelectIndex = (float) animation.getAnimatedValue();
+
+                    if (mSwitchEdge) {
+                        mSelectIndex = Math.min(0, mSelectIndex);
+                        mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
+                    }
+
                     ensureTranslationOrder();
                 }
             });
@@ -549,6 +574,13 @@ public class BannerSwitch extends ViewGroup {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 mSelectIndex = (float) animation.getAnimatedValue();
+
+
+                if (mSwitchEdge) {
+                    mSelectIndex = Math.min(0, mSelectIndex);
+                    mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
+                }
+
                 ensureTranslationOrder();
             }
         });

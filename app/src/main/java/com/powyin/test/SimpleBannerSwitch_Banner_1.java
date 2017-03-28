@@ -29,14 +29,14 @@ public class SimpleBannerSwitch_Banner_1 extends Activity {
         bannerSwitch.setOnItemClickListener(new BannerSwitch.OnItemClickListener() {
             @Override
             public void onItemClicked(int position, View view) {
-                System.out.println("------------------------>>" + position);
+            //    System.out.println("------------------------>>" + position);
             }
         });
 
         bannerSwitch.setOnButtonLineScrollListener(new BannerSwitch.OnButtonLineScrollListener() {
             @Override
             public void onButtonLineScroll(int viewCount, int leftIndex, int rightIndex, View leftView, View rightView, float leftNearWei, float rightNearWei) {
-                System.out.println(":::" + leftIndex + "::" + rightIndex + ":::" + leftNearWei + ":::" + rightNearWei);
+             //   System.out.println(":::" + leftIndex + "::" + rightIndex + ":::" + leftNearWei + ":::" + rightNearWei);
                 bannerUpperView.onButtonLineScroll(viewCount, leftIndex, rightIndex, leftView, rightView, leftNearWei, rightNearWei);
             }
         });
