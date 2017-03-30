@@ -14,9 +14,8 @@
             android:layout_height="match_parent"
             app:pow_switch_auto_ennable="true"
             app:pow_switch_fixed_item="1"
-            app:pow_switch_fixed_edge="false"
+            app:pow_switch_fixed_edge="true"
             android:id="@+id/my_banner" >
-
 
             <FrameLayout
                 android:layout_width="match_parent"

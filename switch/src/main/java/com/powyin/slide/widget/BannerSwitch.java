@@ -9,6 +9,7 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewConfigurationCompat;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -257,6 +258,14 @@ public class BannerSwitch extends ViewGroup {
                 float y = MotionEventCompat.getY(ev, pointerIndex);
                 float yDiff = Math.abs(y - mInitialMotionY);
 
+
+                if (dx != 0 &&
+                        canScroll(this, false, (int) dx, (int) x, (int) y)) {
+                    mIsUnableToDrag = true;
+                    return false;
+                }
+
+
                 if (xDiff > mTouchSlop && xDiff * 0.5f > yDiff) {
                     mIsBeingDragged = true;
                     requestParentDisallowInterceptTouchEvent(true);
@@ -288,6 +297,7 @@ public class BannerSwitch extends ViewGroup {
 
         return mIsBeingDragged;
     }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
@@ -357,6 +367,7 @@ public class BannerSwitch extends ViewGroup {
                     }
                 }
 
+
                 mIsBeingDragged = false;
                 break;
             case MotionEventCompat.ACTION_POINTER_DOWN: {
@@ -416,6 +427,36 @@ public class BannerSwitch extends ViewGroup {
         return true;
     }
 
+    // 检查子元素 是否存在滑动可能
+    private boolean canScroll(View v, boolean checkV, int dx, int x, int y) {
+        if (v instanceof ViewGroup) {
+            final ViewGroup group = (ViewGroup) v;
+            final int scrollX = v.getScrollX();
+            final int scrollY = v.getScrollY();
+            final int count = group.getChildCount();
+            for (int i = count - 1; i >= 0; i--) {
+                final View child = group.getChildAt(i);
+                if (x + scrollX >= child.getLeft() && x + scrollX < child.getRight() &&
+                        y + scrollY >= child.getTop() && y + scrollY < child.getBottom() &&
+                        canScroll(child, true, dx, x + scrollX - child.getLeft(),
+                                y + scrollY - child.getTop())) {
+                    return true;
+                }
+            }
+        }
+
+        return checkV && ViewCompat.canScrollHorizontally(v, -dx);
+    }
+
+    // 重写是否支持滑动
+    @Override
+    public boolean canScrollHorizontally(int direction) {
+        if (!mSwitchEdge) {
+            return true;
+        }
+        return getChildCount() != 0 && ((direction < 0 && mSelectIndex <= -0.05f) || (direction > 0 && mSelectIndex >= -getChildCount() + 1 + 0.05f));
+    }
+
 
     // 取消父类打断触摸事件传递
     private void requestParentDisallowInterceptTouchEvent(boolean disallowIntercept) {
@@ -456,8 +497,6 @@ public class BannerSwitch extends ViewGroup {
             mSelectIndex = Math.min(0, mSelectIndex);
             mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
         }
-
-        System.out.println("info   ---    " + mSelectIndex);
 
         ensureTranslationOrder();
     }
