@@ -183,9 +183,13 @@ public class BannerSwitch extends ViewGroup {
         ensureTranslationOrder();
     }
 
+    MotionEvent ee;
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+        ee = ev;
+        System.out.println("------>>>>>dispatchTouchEvent");
+
         mIsTouched = true;
 
         final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
@@ -199,11 +203,17 @@ public class BannerSwitch extends ViewGroup {
             mIsMultipleFinger = true;
         }
 
+        if(action == MotionEvent.ACTION_DOWN){
+            mIsUnableToDrag = false;
+            mIsBeingDragged = false;
+        }
+
         return super.dispatchTouchEvent(ev);
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        System.out.println("------>>>>>onInterceptTouchEvent   "+(ev == ee));
         final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
             mIsBeingDragged = false;
@@ -301,7 +311,7 @@ public class BannerSwitch extends ViewGroup {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-
+        System.out.println("------>>>>>onTouchEvent   "+(ev == ee));
         if (!mSwitchEnable) {
             if (mVelocityTracker == null) {
                 mVelocityTracker = VelocityTracker.obtain();
@@ -320,12 +330,23 @@ public class BannerSwitch extends ViewGroup {
                 break;
             }
             case MotionEvent.ACTION_MOVE:
-                if (!mIsBeingDragged) {                                                                              // just in case
+                if (!mIsBeingDragged) {
                     if (mActivePointerId == -1) return false;
                     int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
                     if (pointerIndex < 0) return false;
-                    final float x = MotionEventCompat.getX(ev, pointerIndex);
+
+                    float x = MotionEventCompat.getX(ev, pointerIndex);
+                    float y = MotionEventCompat.getY(ev, pointerIndex);
+
                     final float xDiff = Math.abs(x - mLastMotionX);
+
+
+                    if (xDiff != 0 &&
+                            canScroll(this, false, (int) xDiff, (int) x, (int) y)) {
+                        mIsUnableToDrag = true;
+                        return false;
+                    }
+
                     if (xDiff > mTouchSlop) {
                         mIsBeingDragged = true;
                         requestParentDisallowInterceptTouchEvent(true);
@@ -445,7 +466,7 @@ public class BannerSwitch extends ViewGroup {
             }
         }
 
-        return checkV && ViewCompat.canScrollHorizontally(v, -dx);
+        return checkV && ViewCompat.canScrollHorizontally(v, -dx) ;
     }
 
     // 重写是否支持滑动
