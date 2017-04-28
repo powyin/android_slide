@@ -41,7 +41,7 @@ public class SimpleSlideSwitchSingle extends AppCompatActivity {
                 if (leftView != null) {
                     if (leftView instanceof TextView) {
                         TextView tem = (TextView) leftView;
-                        tem.setTextColor(ColorUtil.caculateColor(0xff656565, 0xff009dff, leftNearWei));
+                        tem.setTextColor(ColorUtil.calculationColor(0xff656565, 0xff009dff, leftNearWei));
                         tem.setTextSize(14 * (7 + leftNearWei) / 7);
                     }
 
@@ -49,7 +49,7 @@ public class SimpleSlideSwitchSingle extends AppCompatActivity {
                 if (rightView != null) {
                     if (rightView instanceof TextView) {
                         TextView tem = (TextView) rightView;
-                        tem.setTextColor(ColorUtil.caculateColor(0xff656565, 0xff009dff, rightNearWei));
+                        tem.setTextColor(ColorUtil.calculationColor(0xff656565, 0xff009dff, rightNearWei));
                         tem.setTextSize(14 * (7 + rightNearWei) / 7);
                     }
                 }

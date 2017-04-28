@@ -9,8 +9,8 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewConfigurationCompat;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -31,8 +31,7 @@ import java.util.Map;
  * Created by powyin on 2016/8/5.
  */
 public class BannerSwitch extends ViewGroup {
-    private Scroller mScroller;
-    private VelocityTracker mVelocityTracker;
+
     private boolean mIsBeingDragged;
     private boolean mIsUnableToDrag;
     private boolean mIsMultipleFinger;
@@ -42,13 +41,13 @@ public class BannerSwitch extends ViewGroup {
     private float mInitialMotionY;
     private int mActivePointerId = INVALID_POINTER;
     private static final int INVALID_POINTER = -1;
-    private int mMaximumVelocity;
+
     private OnItemClickListener mOnItemClickListener;
     private OnButtonLineScrollListener mOnButtonLineScrollListener;
     private ValueAnimator mSwitchAnimator;
     private AnimationRun autoProgress;
     private int mSwitchFixedItem;
-    private boolean mSwitchEnable;
+    private boolean mTouchScrollEnable;
     private boolean mSwitchEdge;
     private int mSwitchPagePeriod;
     private int mSwitchAnimationPeriod;
@@ -56,7 +55,8 @@ public class BannerSwitch extends ViewGroup {
     private long mSwitchEndTime;
     private float mSelectIndex;             // 横幅滚动轴；
     private ListAdapter mListAdapter;
-    Map<Integer, TypeViewInfo> mTypeToView = new HashMap<>();
+
+    SparseArray<TypeViewInfo> mTypeToView = new SparseArray<TypeViewInfo>();
 
     private final DataSetObserver mDataSetObserver = new DataSetObserver() {
         @Override
@@ -82,7 +82,7 @@ public class BannerSwitch extends ViewGroup {
 
         @Override
         public void run() {
-            if (isCancel || !mSwitchEnable) return;
+            if (isCancel) return;
             long pre = (System.currentTimeMillis() - mSwitchEndTime);
             if (getVisibility() == VISIBLE && !mIsTouched && pre >= mSwitchPagePeriod / 3) {
                 startInternalFlySwipePage(-1);
@@ -109,7 +109,7 @@ public class BannerSwitch extends ViewGroup {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BannerSwitch);
 
         mSwitchFixedItem = a.getInt(R.styleable.BannerSwitch_pow_switch_fixed_item, 1);
-        mSwitchEnable = a.getBoolean(R.styleable.BannerSwitch_pow_switch_auto_ennable, true);
+        mTouchScrollEnable = a.getBoolean(R.styleable.BannerSwitch_pow_switch_touch_scroll, true);
         mSwitchEdge = a.getBoolean(R.styleable.BannerSwitch_pow_switch_fixed_edge, false);
 
 
@@ -127,9 +127,6 @@ public class BannerSwitch extends ViewGroup {
 
         ViewConfiguration configuration = ViewConfiguration.get(context);
         mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
-        mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
-        mScroller = new Scroller(context);
-        mVelocityTracker = VelocityTracker.obtain();
 
 
     }
@@ -183,12 +180,12 @@ public class BannerSwitch extends ViewGroup {
         ensureTranslationOrder();
     }
 
-    MotionEvent ee;
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        ee = ev;
-        System.out.println("------>>>>>dispatchTouchEvent");
+        if (!mTouchScrollEnable) {
+            return super.dispatchTouchEvent(ev);
+        }
 
         mIsTouched = true;
 
@@ -203,7 +200,7 @@ public class BannerSwitch extends ViewGroup {
             mIsMultipleFinger = true;
         }
 
-        if(action == MotionEvent.ACTION_DOWN){
+        if (action == MotionEvent.ACTION_DOWN) {
             mIsUnableToDrag = false;
             mIsBeingDragged = false;
         }
@@ -213,18 +210,16 @@ public class BannerSwitch extends ViewGroup {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        System.out.println("------>>>>>onInterceptTouchEvent   "+(ev == ee));
+        if (!mTouchScrollEnable) {
+            return super.onInterceptTouchEvent(ev);
+        }
+
         final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
             mIsBeingDragged = false;
             mIsUnableToDrag = false;
             mActivePointerId = INVALID_POINTER;
 
-            if (!mSwitchEnable) {
-                if (mVelocityTracker != null) {
-                    mVelocityTracker.clear();
-                }
-            }
 
             return false;
         }
@@ -297,26 +292,14 @@ public class BannerSwitch extends ViewGroup {
                 onSecondaryPointerUp(ev);
                 break;
         }
-
-        if (!mSwitchEnable) {
-            if (mVelocityTracker == null) {
-                mVelocityTracker = VelocityTracker.obtain();
-            }
-            mVelocityTracker.addMovement(ev);
-        }
-
         return mIsBeingDragged;
     }
 
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        System.out.println("------>>>>>onTouchEvent   "+(ev == ee));
-        if (!mSwitchEnable) {
-            if (mVelocityTracker == null) {
-                mVelocityTracker = VelocityTracker.obtain();
-            }
-            mVelocityTracker.addMovement(ev);
+        if (!mTouchScrollEnable) {
+            return super.onTouchEvent(ev);
         }
 
         final int action = ev.getAction();
@@ -382,12 +365,6 @@ public class BannerSwitch extends ViewGroup {
                 }
                 mActivePointerId = INVALID_POINTER;
 
-                if (!mSwitchEnable) {
-                    if (mVelocityTracker != null) {
-                        mVelocityTracker.clear();
-                    }
-                }
-
 
                 mIsBeingDragged = false;
                 break;
@@ -415,7 +392,7 @@ public class BannerSwitch extends ViewGroup {
         if (autoProgress != null) {
             autoProgress.isCancel = true;
         }
-        if (mSwitchEnable && !mSwitchEdge) {
+        if (!mSwitchEdge) {
             autoProgress = new AnimationRun();
             postDelayed(autoProgress, (int) (mSwitchPagePeriod / 1.5f));
         }
@@ -466,7 +443,7 @@ public class BannerSwitch extends ViewGroup {
             }
         }
 
-        return checkV && ViewCompat.canScrollHorizontally(v, -dx) ;
+        return checkV && ViewCompat.canScrollHorizontally(v, -dx);
     }
 
     // 重写是否支持滑动
@@ -495,11 +472,6 @@ public class BannerSwitch extends ViewGroup {
             final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
             mLastMotionX = MotionEventCompat.getX(ev, newPointerIndex);
             mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
-            if (!mSwitchEnable) {
-                if (mVelocityTracker != null) {
-                    mVelocityTracker.clear();
-                }
-            }
         }
     }
 
@@ -534,92 +506,50 @@ public class BannerSwitch extends ViewGroup {
     // 抬手后状态恢复动画
     private void startInternalFly() {
 
-        if (!mSwitchEnable) {
-            float pace = Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), 0) / mSwitchFixedItem;
-            if (pace < 0) {
-                return;
-            }
+        double diff = mSelectIndex - Math.rint(mSelectIndex);
 
-            mVelocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
-            int initialVelocity = (int) VelocityTrackerCompat.getXVelocity(
-                    mVelocityTracker, mActivePointerId);
+        if (diff == 0) return;
 
-            if (mSwitchAnimator != null) mSwitchAnimator.cancel();
+        if (mSwitchAnimator != null) mSwitchAnimator.cancel();
+        final float mTarget;
 
-            mScroller.abortAnimation();
-            mScroller.fling(0, 0, initialVelocity, 0, -100000, 100000, 0, 0);
-            if (mScroller.getDuration() == 0) return;
-
-            final float startSelectIndex = mSelectIndex;
-
-            mSwitchAnimator = ValueAnimator.ofFloat(0, 1);
-            mSwitchAnimator.setDuration(mScroller.getDuration());
-            mSwitchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    if (mScroller.computeScrollOffset()) {
-                        float pace = Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), 0) / mSwitchFixedItem;
-
-                        mSelectIndex = startSelectIndex + mScroller.getCurrX() / pace;
-
-                        if (mSwitchEdge) {
-                            mSelectIndex = Math.min(0, mSelectIndex);
-                            mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
-                        }
-
-                        ensureTranslationOrder();
-                    } else {
-                        animation.cancel();
-                    }
-                }
-            });
-            mSwitchAnimator.start();
-            mSwitchEndTime = System.currentTimeMillis() + mSwitchAnimator.getDuration() + 100;
-        } else {
-
-            double diff = mSelectIndex - Math.rint(mSelectIndex);
-
-            if (diff == 0) return;
-
-            if (mSwitchAnimator != null) mSwitchAnimator.cancel();
-            final float mTarget;
-
-            if (Math.abs(diff) < 0.05) {
-                mTarget = (int) Math.rint(mSelectIndex);
-            } else if (mLastMotionX - mInitialMotionX > 0) {
-                if (Math.abs((int) mSelectIndex - mSelectIndex) > 0.5 && mSelectIndex < 0 || Math.abs((int) mSelectIndex - mSelectIndex) <= 0.5 && mSelectIndex > 0) {
-                    mTarget = (int) (Math.rint(mSelectIndex) + 1);
-                } else {
-                    mTarget = (int) (Math.rint(mSelectIndex));
-                }
+        if (Math.abs(diff) < 0.05) {
+            mTarget = (int) Math.rint(mSelectIndex);
+        } else if (mLastMotionX - mInitialMotionX > 0) {
+            if (Math.abs((int) mSelectIndex - mSelectIndex) > 0.5 && mSelectIndex < 0 || Math.abs((int) mSelectIndex - mSelectIndex) <= 0.5 && mSelectIndex > 0) {
+                mTarget = (int) (Math.rint(mSelectIndex) + 1);
             } else {
-                if (Math.abs((int) mSelectIndex - mSelectIndex) > 0.5 && mSelectIndex < 0 || Math.abs((int) mSelectIndex - mSelectIndex) <= 0.5 && mSelectIndex > 0) {
-                    mTarget = (int) (Math.rint(mSelectIndex));
-                } else {
-                    mTarget = (int) (Math.rint(mSelectIndex) - 1);
-                }
+                mTarget = (int) (Math.rint(mSelectIndex));
             }
-
-
-            mSwitchAnimator = ValueAnimator.ofFloat(mSelectIndex, mTarget);
-            mSwitchAnimator.setDuration(Math.max(50, (int) Math.abs((mSelectIndex - mTarget) * mSwitchAnimationPeriod) / mSwitchFixedItem));
-            mSwitchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    mSelectIndex = (float) animation.getAnimatedValue();
-
-                    if (mSwitchEdge) {
-                        mSelectIndex = Math.min(0, mSelectIndex);
-                        mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
-                    }
-
-                    ensureTranslationOrder();
-                }
-            });
-            mSwitchAnimator.start();
-            mSwitchEndTime = System.currentTimeMillis() + mSwitchAnimator.getDuration() + 100;
+        } else {
+            if (Math.abs((int) mSelectIndex - mSelectIndex) > 0.5 && mSelectIndex < 0 || Math.abs((int) mSelectIndex - mSelectIndex) <= 0.5 && mSelectIndex > 0) {
+                mTarget = (int) (Math.rint(mSelectIndex));
+            } else {
+                mTarget = (int) (Math.rint(mSelectIndex) - 1);
+            }
         }
+
+
+        mSwitchAnimator = ValueAnimator.ofFloat(mSelectIndex, mTarget);
+        mSwitchAnimator.setDuration(Math.max(50, (int) Math.abs((mSelectIndex - mTarget) * mSwitchAnimationPeriod) / mSwitchFixedItem));
+        mSwitchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mSelectIndex = (float) animation.getAnimatedValue();
+
+                if (mSwitchEdge) {
+                    mSelectIndex = Math.min(0, mSelectIndex);
+                    mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
+                }
+
+                ensureTranslationOrder();
+            }
+        });
+        mSwitchAnimator.start();
+        mSwitchEndTime = System.currentTimeMillis() + mSwitchAnimator.getDuration() + 100;
+
     }
+
 
     // 自动轮播动画
     private void startInternalFlySwipePage(int step) {
@@ -635,7 +565,6 @@ public class BannerSwitch extends ViewGroup {
             public void onAnimationUpdate(ValueAnimator animation) {
                 mSelectIndex = (float) animation.getAnimatedValue();
 
-
                 if (mSwitchEdge) {
                     mSelectIndex = Math.min(0, mSelectIndex);
                     mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
@@ -649,7 +578,6 @@ public class BannerSwitch extends ViewGroup {
     }
 
     // 实现viewItem滚动总入口
-    // 不要问为什么 这些东西是 / % 的问题  没有为什么
     private void ensureTranslationOrder() {
 
         int count = getChildCount();
@@ -687,16 +615,21 @@ public class BannerSwitch extends ViewGroup {
     // 刷新Adapter
     private void refreshAdapter() {
         removeAllViews();
-        for (TypeViewInfo info : mTypeToView.values()) {
-            info.currentUsedPosition = 0;
+
+        for(int i=0 ;i <mTypeToView.size();i++){
+            mTypeToView.valueAt(i).currentUsedPosition = 0;
         }
+
         int count = mListAdapter != null ? mListAdapter.getCount() : 0;
         for (int i = 0; i < count; i++) {
             Integer type = mListAdapter.getItemViewType(i);
-            if (!mTypeToView.containsKey(type)) {
+
+            if(mTypeToView.indexOfKey(type) <0){
                 mTypeToView.put(type, new TypeViewInfo(type));
             }
+
             TypeViewInfo info = mTypeToView.get(type);
+
             View canvasView = info.currentUsedPosition < info.holdViews.size() ? info.holdViews.get(info.currentUsedPosition) : null;
             View current = mListAdapter.getView(i, canvasView, this);
             if (current == null)
@@ -722,7 +655,7 @@ public class BannerSwitch extends ViewGroup {
         int count = mListAdapter.getCount();
         for (int i = 0; i < count; i++) {
             Integer type = mListAdapter.getItemViewType(i);
-            if (!mTypeToView.containsKey(type)) {
+            if (mTypeToView.indexOfKey(type) < 0) {
                 mTypeToView.put(type, new TypeViewInfo(type));
             }
             TypeViewInfo info = mTypeToView.get(type);
@@ -738,7 +671,7 @@ public class BannerSwitch extends ViewGroup {
 
     //------------------------------------------------------------------setting-----------------------------------------------------------//
 
-
+    // 设置适配器
     public void setAdapter(ListAdapter adapter) {
         if (mListAdapter == adapter) return;
         if (mListAdapter != null) {
@@ -749,6 +682,49 @@ public class BannerSwitch extends ViewGroup {
             adapter.registerDataSetObserver(mDataSetObserver);
         }
         computeAdapter();
+    }
+
+    /**
+     * @param index           选中页面
+     * @param animation       是否滑动过渡
+     */
+    public void setSelectPage(int index, boolean animation){
+        if (mSwitchAnimator != null) {
+            mSwitchAnimator.cancel();
+            mSwitchAnimator = null;
+        }
+
+        if(index == mSelectIndex){
+            return;
+        }
+
+        if(animation){
+            mSwitchAnimator = ValueAnimator.ofFloat(mSelectIndex, index);
+            mSwitchAnimator.setDuration(Math.max(50, (int) Math.abs((mSelectIndex - index) * mSwitchAnimationPeriod) / mSwitchFixedItem));
+            mSwitchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    mSelectIndex = (float) animation.getAnimatedValue();
+
+                    if (mSwitchEdge) {
+                        mSelectIndex = Math.min(0, mSelectIndex);
+                        mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
+                    }
+
+                    ensureTranslationOrder();
+                }
+            });
+            mSwitchAnimator.start();
+            mSwitchEndTime = System.currentTimeMillis() + mSwitchAnimator.getDuration() + 50;
+        }else {
+            mSelectIndex = index;
+            if (mSwitchEdge) {
+                mSelectIndex = Math.min(0, mSelectIndex);
+                mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
+            }
+            ensureTranslationOrder();
+        }
+
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

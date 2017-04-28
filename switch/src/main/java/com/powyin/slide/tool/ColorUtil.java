@@ -5,8 +5,13 @@ package com.powyin.slide.tool;
  */
 public class ColorUtil {
 
-    // 获取 startColor 与 endColor 颜色的 中间值
-    public static int caculateColor(int startColor, int endColor, float radio) {
+    /**
+     * @param startColor   起始颜色
+     * @param endColor     末尾颜色
+     * @param radio        过度值 -1 ~ +1
+     * @return             混合颜色
+     */
+    public static int calculationColor(int startColor, int endColor, float radio) {
         radio = Math.max(0, radio);
         radio = Math.min(1, radio);
 

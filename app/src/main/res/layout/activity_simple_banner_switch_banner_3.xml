@@ -12,7 +12,7 @@
         <com.powyin.slide.widget.BannerSwitch
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:pow_switch_auto_ennable="true"
+
             app:pow_switch_fixed_item="3"
             android:id="@+id/my_banner" >
 

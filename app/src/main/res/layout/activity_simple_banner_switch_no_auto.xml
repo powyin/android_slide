@@ -8,7 +8,7 @@
     <com.powyin.slide.widget.BannerSwitch
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        app:pow_switch_auto_ennable="false"
+        app:pow_switch_touch_scroll="false"
         android:id="@+id/my_banner">
 
         <FrameLayout

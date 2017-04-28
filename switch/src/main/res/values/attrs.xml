@@ -10,10 +10,15 @@
     </declare-styleable>
 
     <declare-styleable name="BannerSwitch">
+        <!--单页显示最大条数-->
         <attr name="pow_switch_fixed_item" format="integer"/>
-        <attr name="pow_switch_auto_ennable" format="boolean"/>
+        <!--是否支持触摸滚动-->
+        <attr name="pow_switch_touch_scroll" format="boolean"/>
+        <!--是否显示边界 如果显示无法无线轮播-->
         <attr name="pow_switch_fixed_edge" format="boolean"/>
+        <!--自动切换时间间隔-->
         <attr name="pow_switch_period" format="integer"/>
+        <!--自动切换动画时间-->
         <attr name="pow_switch_animation_period" format="integer"/>
     </declare-styleable>
 

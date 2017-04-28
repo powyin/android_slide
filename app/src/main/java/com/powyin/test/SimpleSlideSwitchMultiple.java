@@ -1,7 +1,6 @@
 package com.powyin.test;
 
 import android.os.Bundle;
-import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -44,7 +43,7 @@ public class SimpleSlideSwitchMultiple extends AppCompatActivity {
                 if (leftView != null) {
                     if (leftView instanceof TextView) {
                         TextView tem = (TextView) leftView;
-                        tem.setTextColor(ColorUtil.caculateColor(0xff656565, 0xff009dff, leftNearWei));
+                        tem.setTextColor(ColorUtil.calculationColor(0xff656565, 0xff009dff, leftNearWei));
                         tem.setTextSize(14 * (7 + leftNearWei) / 7);
                     }
 
@@ -52,7 +51,7 @@ public class SimpleSlideSwitchMultiple extends AppCompatActivity {
                 if (rightView != null) {
                     if (rightView instanceof TextView) {
                         TextView tem = (TextView) rightView;
-                        tem.setTextColor(ColorUtil.caculateColor(0xff656565, 0xff009dff, rightNearWei));
+                        tem.setTextColor(ColorUtil.calculationColor(0xff656565, 0xff009dff, rightNearWei));
                         tem.setTextSize(14 * (7 + rightNearWei) / 7);
                     }
                 }
