@@ -2,11 +2,7 @@ package com.powyin.test;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.powyin.slide.widget.BannerSwitch;
 import com.powyin.slide.widget.BannerUpperView;
@@ -33,6 +29,15 @@ public class SimpleBannerSwitch_Banner_1 extends Activity {
         setContentView(R.layout.activity_simple_banner_switch_banner_1);
         bannerSwitch = (BannerSwitch) findViewById(R.id.my_banner);
         bannerUpperView = (BannerUpperView) findViewById(R.id.my_banner_upper_view);
+
+        bannerSwitch.setOnButtonLineScrollListener(new BannerSwitch.OnScrollListener() {
+            @Override
+            public void onPageScrolled(int postion, float positionOffset) {
+                System.out.println("---------------------------->>>>>>1111111   "+postion + " "+positionOffset);
+
+            }
+
+        });
 
 //        viewPager.setAdapter(new PagerAdapter() {
 //            @Override
@@ -73,14 +78,14 @@ public class SimpleBannerSwitch_Banner_1 extends Activity {
             }
         });
 
-        bannerSwitch.setOnButtonLineScrollListener(new BannerSwitch.OnButtonLineScrollListener() {
-            @Override
-            public void onButtonLineScroll(int viewCount, int leftIndex, int rightIndex, View leftView, View rightView, float leftNearWei, float rightNearWei) {
-             //   System.out.println(":::" + leftIndex + "::" + rightIndex + ":::" + leftNearWei + ":::" + rightNearWei);
-                bannerUpperView.onButtonLineScroll(viewCount, leftIndex, rightIndex, leftView, rightView, leftNearWei, rightNearWei);
-            }
-        });
-
+//        bannerSwitch.setOnButtonLineScrollListener(new BannerSwitch.OnScrollListener() {
+//            @Override
+//            public void onButtonLineScroll(int viewCount, int leftIndex, int rightIndex, View leftView, View rightView, float leftNearWei, float rightNearWei) {
+//             //   System.out.println(":::" + leftIndex + "::" + rightIndex + ":::" + leftNearWei + ":::" + rightNearWei);
+//                bannerUpperView.onButtonLineScroll(viewCount, leftIndex, rightIndex, leftView, rightView, leftNearWei, rightNearWei);
+//            }
+//        });
+//
 
     }
 

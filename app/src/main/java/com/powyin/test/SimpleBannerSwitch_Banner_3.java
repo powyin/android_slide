@@ -36,13 +36,31 @@ public class SimpleBannerSwitch_Banner_3 extends Activity {
             }
         });
 
-        bannerSwitch.setOnButtonLineScrollListener(new BannerSwitch.OnButtonLineScrollListener() {
+
+//        bannerSwitch.setOnButtonLineScrollListener(new BannerSwitch.OnScrollListener() {
+//            @Override
+//            public void onButtonLineScroll(int viewCount, int leftIndex, int rightIndex, View leftView, View rightView, float leftNearWei, float rightNearWei) {
+//                bannerUpperView.onButtonLineScroll(viewCount, leftIndex, rightIndex, leftView, rightView, leftNearWei, rightNearWei);
+//            }
+//        });
+
+        bannerSwitch.setOnButtonLineScrollListener(new BannerSwitch.OnScrollListener() {
             @Override
-            public void onButtonLineScroll(int viewCount, int leftIndex, int rightIndex, View leftView, View rightView, float leftNearWei, float rightNearWei) {
-                bannerUpperView.onButtonLineScroll(viewCount, leftIndex, rightIndex, leftView, rightView, leftNearWei, rightNearWei);
+            public void onPageScrolled(int position, float positionOffset) {
+                System.out.println("                    onPageScrolled " + position + "      " +bannerSwitch.getSelectPage());
+
             }
         });
 
+        bannerSwitch.setOnItemClickListener(new BannerSwitch.OnItemClickListener() {
+            @Override
+            public void onItemClicked(int position, View view) {
+                System.out.println("                    onItemClicked " + position + "      " +bannerSwitch.getSelectPage());
+                bannerSwitch.setSelectPage(position,true);
+            }
+        });
+
+        bannerSwitch.setSelectPage(0,false);
 
     }
 

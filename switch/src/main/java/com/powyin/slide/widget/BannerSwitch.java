@@ -5,27 +5,22 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.graphics.Rect;
+import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewConfigurationCompat;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.MotionEvent;
-import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ListAdapter;
-import android.widget.Scroller;
 
 import com.powyin.slide.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by powyin on 2016/8/5.
@@ -39,11 +34,15 @@ public class BannerSwitch extends ViewGroup {
     private float mLastMotionX;
     private float mInitialMotionX;
     private float mInitialMotionY;
+
+    private long mTouchTimeBegin;
+    private long mTouchTimeEnd;
+
     private int mActivePointerId = INVALID_POINTER;
     private static final int INVALID_POINTER = -1;
 
     private OnItemClickListener mOnItemClickListener;
-    private OnButtonLineScrollListener mOnButtonLineScrollListener;
+    private OnScrollListener mOnScrollListener;
     private ValueAnimator mSwitchAnimator;
     private AnimationRun autoProgress;
     private int mSwitchFixedItem;
@@ -52,8 +51,9 @@ public class BannerSwitch extends ViewGroup {
     private int mSwitchPagePeriod;
     private int mSwitchAnimationPeriod;
     private boolean mIsTouched;
-    private long mSwitchEndTime;
     private float mSelectIndex;             // 横幅滚动轴；
+
+
     private ListAdapter mListAdapter;
 
     SparseArray<TypeViewInfo> mTypeToView = new SparseArray<TypeViewInfo>();
@@ -79,20 +79,28 @@ public class BannerSwitch extends ViewGroup {
 
     private class AnimationRun implements Runnable {
         boolean isCancel;
+        boolean delay = false;
 
         @Override
         public void run() {
-            if (isCancel) return;
-            long pre = (System.currentTimeMillis() - mSwitchEndTime);
-            if (getVisibility() == VISIBLE && !mIsTouched && pre >= mSwitchPagePeriod / 3) {
-                startInternalFlySwipePage(-1);
+            // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
+            if (isCancel || mSwitchFixedItem > getChildCount() || mSwitchEdge) {
+                return;
+            }
+            // ------------------------------------------------------------------------------------------------------------------------------//
+
+
+            if (getVisibility() == VISIBLE && !delay) {
+                startInternalPageFly(-1, true);
             }
 
-            if (pre >= mSwitchPagePeriod / 3) {
-                postDelayed(this, mSwitchPagePeriod);
+            if (delay) {
+                postDelayed(this, mSwitchPagePeriod / 2);
             } else {
-                postDelayed(this, mSwitchPagePeriod / 10);
+                postDelayed(this, mSwitchPagePeriod);
             }
+
+            delay = false;
         }
     }
 
@@ -126,9 +134,23 @@ public class BannerSwitch extends ViewGroup {
         setScrollingCacheEnabled();
 
         ViewConfiguration configuration = ViewConfiguration.get(context);
-        mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
+        mTouchSlop = configuration.getScaledPagingTouchSlop();
 
 
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
+        if (mSwitchFixedItem > getChildCount()) {
+            mSelectIndex = Math.min(mSelectIndex, mSwitchFixedItem / 2);
+            mSelectIndex = Math.max(mSelectIndex, mSwitchFixedItem / 2 - getChildCount() + 1);
+        } else if (mSwitchEdge) {
+            mSelectIndex = Math.min(0, mSelectIndex);
+            mSelectIndex = Math.max(-getChildCount() + mSwitchFixedItem, mSelectIndex);
+        }
+        // ------------------------------------------------------------------------------------------------------------------------------//
     }
 
     @Override
@@ -177,19 +199,44 @@ public class BannerSwitch extends ViewGroup {
             int childHeight = child.getMeasuredHeight();
             child.layout(childLeft, childTop, childLeft + pace, childHeight + childTop);
         }
+
         ensureTranslationOrder();
+
     }
 
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+        final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
+
+        if (autoProgress != null) {
+            autoProgress.delay = true;
+        }
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                mLastMotionX = mInitialMotionX = ev.getX();
+                mInitialMotionY = ev.getY();
+                mTouchTimeBegin = System.currentTimeMillis();
+
+                break;
+            case MotionEvent.ACTION_UP:
+                mTouchTimeEnd = System.currentTimeMillis();
+
+                break;
+            case MotionEvent.ACTION_CANCEL:
+
+                mTouchTimeEnd = System.currentTimeMillis() + 2000;
+                break;
+        }
+
+
         if (!mTouchScrollEnable) {
             return super.dispatchTouchEvent(ev);
         }
 
         mIsTouched = true;
 
-        final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
 
         if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
             mIsTouched = false;
@@ -235,13 +282,13 @@ public class BannerSwitch extends ViewGroup {
 
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
-                mLastMotionX = mInitialMotionX = ev.getX();
-                mInitialMotionY = ev.getY();
-                mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+
+                mActivePointerId = ev.getPointerId(0);   // MotionEventCompat.getPointerId(ev, 0);
                 mIsUnableToDrag = false;
 
                 if (mSwitchAnimator != null && mSwitchAnimator.isStarted() && mSwitchAnimator.isRunning()) {
                     mSwitchAnimator.cancel();
+                    mSwitchAnimator = null;
                     mIsBeingDragged = true;
                     requestParentDisallowInterceptTouchEvent(true);
                 } else {
@@ -306,10 +353,7 @@ public class BannerSwitch extends ViewGroup {
 
         switch (action & MotionEventCompat.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN: {
-
-                mLastMotionX = mInitialMotionX = ev.getX();
-                mInitialMotionY = ev.getY();
-                mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+                mActivePointerId = ev.getPointerId(0);
                 break;
             }
             case MotionEvent.ACTION_MOVE:
@@ -360,7 +404,7 @@ public class BannerSwitch extends ViewGroup {
                 }
             case MotionEvent.ACTION_CANCEL:
                 if (mIsBeingDragged) {
-                    startInternalFly();
+                    startInternalTouchFly();
                     ViewCompat.postInvalidateOnAnimation(this);
                 }
                 mActivePointerId = INVALID_POINTER;
@@ -385,44 +429,61 @@ public class BannerSwitch extends ViewGroup {
         return true;
     }
 
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
+    // 自动轮播控制器
+    private void tryAddAutoBanner() {
         if (autoProgress != null) {
             autoProgress.isCancel = true;
         }
-        if (!mSwitchEdge) {
+
+        // 不显示边界 && 子View 有足够容量
+        if (!mSwitchEdge && getChildCount() >= mSwitchFixedItem) {
             autoProgress = new AnimationRun();
             postDelayed(autoProgress, (int) (mSwitchPagePeriod / 1.5f));
         }
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
+    // 自动轮播取消
+    private void cancelBanner() {
         if (autoProgress != null) {
             autoProgress.isCancel = true;
         }
     }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        tryAddAutoBanner();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        cancelBanner();
+    }
+
+
+    @Override
+    public void setOnClickListener(@Nullable OnClickListener l) {
+        throw new RuntimeException("not support onClickListener");
+    }
 
     private boolean performItemClick() {
-        for (int i = 0; i < getChildCount(); i++) {
-            Rect globeRect = new Rect();
-            View view = getChildAt(i);
-            globeRect.top = view.getTop();
-            globeRect.left = view.getLeft() + (int) view.getTranslationX();
-            globeRect.right = view.getRight() + (int) view.getTranslationX();
-            globeRect.bottom = view.getBottom();
+        if (mOnItemClickListener != null && (mTouchTimeEnd - mTouchTimeBegin) < 650) {
+            for (int i = 0; i < getChildCount(); i++) {
+                Rect globeRect = new Rect();
+                View view = getChildAt(i);
+                globeRect.top = view.getTop();
+                globeRect.left = view.getLeft() + (int) view.getTranslationX();
+                globeRect.right = view.getRight() + (int) view.getTranslationX();
+                globeRect.bottom = view.getBottom();
 
-            if (globeRect.contains((int) mInitialMotionX, (int) mInitialMotionY)) {
-                if (mOnItemClickListener != null) {
+                if (globeRect.contains((int) mInitialMotionX, (int) mInitialMotionY)) {
                     mOnItemClickListener.onItemClicked(i, view);
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
 
     // 检查子元素 是否存在滑动可能
@@ -484,12 +545,19 @@ public class BannerSwitch extends ViewGroup {
         mLastMotionX += scrollX - (int) scrollX;
         float pace = Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), 0) / mSwitchFixedItem;
         if (pace <= 0) return;
+
         mSelectIndex -= deltaX / pace;
 
-        if (mSwitchEdge) {
+        // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
+        if (mSwitchFixedItem > getChildCount()) {
+            mSelectIndex = Math.min(mSelectIndex, mSwitchFixedItem / 2);
+            mSelectIndex = Math.max(mSelectIndex, mSwitchFixedItem / 2 - getChildCount() + 1);
+        } else if (mSwitchEdge) {
             mSelectIndex = Math.min(0, mSelectIndex);
-            mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
+            mSelectIndex = Math.max(-getChildCount() + mSwitchFixedItem, mSelectIndex);
         }
+        // ------------------------------------------------------------------------------------------------------------------------------//
+
 
         ensureTranslationOrder();
     }
@@ -504,14 +572,15 @@ public class BannerSwitch extends ViewGroup {
     }
 
     // 抬手后状态恢复动画
-    private void startInternalFly() {
+    private void startInternalTouchFly() {
 
         double diff = mSelectIndex - Math.rint(mSelectIndex);
 
-        if (diff == 0) return;
-
-        if (mSwitchAnimator != null) mSwitchAnimator.cancel();
-        final float mTarget;
+        if (mSwitchAnimator != null) {
+            mSwitchAnimator.cancel();
+            mSwitchAnimator = null;
+        }
+        int mTarget;
 
         if (Math.abs(diff) < 0.05) {
             mTarget = (int) Math.rint(mSelectIndex);
@@ -529,52 +598,81 @@ public class BannerSwitch extends ViewGroup {
             }
         }
 
+        // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
+        if (mSwitchFixedItem > getChildCount()) {
+            mTarget = Math.min(mTarget, mSwitchFixedItem / 2);
+            mTarget = Math.max(mTarget, mSwitchFixedItem / 2 - getChildCount() + 1);
+        } else if (mSwitchEdge) {
+            mTarget = Math.min(0, mTarget);
+            mTarget = Math.max(-getChildCount() + mSwitchFixedItem, mTarget);
+        }
 
-        mSwitchAnimator = ValueAnimator.ofFloat(mSelectIndex, mTarget);
+        if (mSelectIndex - Math.rint(mTarget) == 0) return;
+        // ------------------------------------------------------------------------------------------------------------------------------//
+
+        final ValueAnimator current = ValueAnimator.ofFloat(mSelectIndex, mTarget);
+        mSwitchAnimator = current;
         mSwitchAnimator.setDuration(Math.max(50, (int) Math.abs((mSelectIndex - mTarget) * mSwitchAnimationPeriod) / mSwitchFixedItem));
         mSwitchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
+                if (mSwitchAnimator != current) return;
                 mSelectIndex = (float) animation.getAnimatedValue();
-
-                if (mSwitchEdge) {
-                    mSelectIndex = Math.min(0, mSelectIndex);
-                    mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
-                }
 
                 ensureTranslationOrder();
             }
         });
         mSwitchAnimator.start();
-        mSwitchEndTime = System.currentTimeMillis() + mSwitchAnimator.getDuration() + 100;
+        if (autoProgress != null) {
+            autoProgress.delay = true;
+        }
 
     }
 
-
     // 自动轮播动画
-    private void startInternalFlySwipePage(int step) {
-        if (mSwitchAnimator != null && mSwitchAnimator.isStarted() && mSwitchAnimator.isRunning()) {
-            return;
+    private void startInternalPageFly(float step, boolean animation) {
+        if (mSwitchAnimator != null) {
+            mSwitchAnimator.cancel();
+            mSwitchAnimator = null;
         }
 
-        float mTarget = (int) (Math.rint(mSelectIndex) + step);
-        mSwitchAnimator = ValueAnimator.ofFloat(mSelectIndex, mTarget);
-        mSwitchAnimator.setDuration(Math.max(50, (int) Math.abs((mSelectIndex - mTarget) * mSwitchAnimationPeriod) / mSwitchFixedItem));
-        mSwitchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                mSelectIndex = (float) animation.getAnimatedValue();
+        float mTarget = (int) (Math.rint(mSelectIndex + step));
 
-                if (mSwitchEdge) {
-                    mSelectIndex = Math.min(0, mSelectIndex);
-                    mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
+
+        // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
+        if (mSwitchFixedItem > getChildCount()) {
+            mTarget = Math.min(mTarget, mSwitchFixedItem / 2);
+
+            mTarget = Math.max(mTarget, mSwitchFixedItem / 2 - getChildCount() + 1);
+
+        } else if (mSwitchEdge) {
+            mTarget = Math.min(0, mTarget);
+            mTarget = Math.max(-getChildCount() + mSwitchFixedItem, mTarget);
+        }
+
+
+        // ------------------------------------------------------------------------------------------------------------------------------//
+
+        if (animation) {
+            final ValueAnimator current = ValueAnimator.ofFloat(mSelectIndex, mTarget);
+            mSwitchAnimator = current;
+            mSwitchAnimator.setDuration(Math.max(150, (int) Math.abs((mSelectIndex - mTarget) * mSwitchAnimationPeriod) / mSwitchFixedItem));
+            mSwitchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    if (mSwitchAnimator != current) return;
+                    mSelectIndex = (float) animation.getAnimatedValue();
+                    ensureTranslationOrder();
                 }
+            });
+            mSwitchAnimator.start();
 
-                ensureTranslationOrder();
-            }
-        });
-        mSwitchAnimator.start();
-        mSwitchEndTime = System.currentTimeMillis() + mSwitchAnimator.getDuration() + 50;
+        } else {
+            mSelectIndex = mTarget;
+            ensureTranslationOrder();
+
+        }
+
     }
 
     // 实现viewItem滚动总入口
@@ -582,30 +680,28 @@ public class BannerSwitch extends ViewGroup {
 
         int count = getChildCount();
         float pace = Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), 0) / mSwitchFixedItem;
-        if (count < 2 || pace <= 0) return;
+        if (count < 2 || pace <= 0) {
+            return;
+        }
 
-        if (mOnButtonLineScrollListener != null) {
-            float index = (mSwitchFixedItem / 2 - mSelectIndex) % count;
-            if (index < 0) index += count;
-
-            int locLeft = (int) index;
-            int locRight = locLeft + 1 >= count ? 0 : locLeft + 1;
-            float diff = index - locLeft;
-
-            mOnButtonLineScrollListener.onButtonLineScroll(
-                    count, locLeft, locRight, getChildAt(locLeft), getChildAt(locRight), 1 - diff, diff);
+        if (mOnScrollListener != null) {
+            float[] target = getSelectCenter();
+            mOnScrollListener.onPageScrolled((int) target[0], target[1]);
         }
 
 
+        int scrollWidth = (int) (Math.max(count, mSwitchFixedItem) * pace);
+
         for (int i = 0; i < count; i++) {
             int x = (int) ((i + mSelectIndex) * pace);
-            int transX = x % (int) (count * pace);
+            int transX = x % scrollWidth;
+
             if (transX >= (int) (mSwitchFixedItem * pace)) {
-                // 防止右边空白
-                getChildAt(i).setTranslationX((int) (transX - count * pace));
-            } else if (transX <= (int) ((-pace))) {
                 // 防止左边空白
-                getChildAt(i).setTranslationX((int) (transX + count * pace));
+                getChildAt(i).setTranslationX((transX - scrollWidth));
+            } else if (transX <= (int) ((-pace))) {
+                // 防止右边空白
+                getChildAt(i).setTranslationX((transX + scrollWidth));
             } else {
                 getChildAt(i).setTranslationX(transX);
             }
@@ -616,7 +712,7 @@ public class BannerSwitch extends ViewGroup {
     private void refreshAdapter() {
         removeAllViews();
 
-        for(int i=0 ;i <mTypeToView.size();i++){
+        for (int i = 0; i < mTypeToView.size(); i++) {
             mTypeToView.valueAt(i).currentUsedPosition = 0;
         }
 
@@ -624,7 +720,7 @@ public class BannerSwitch extends ViewGroup {
         for (int i = 0; i < count; i++) {
             Integer type = mListAdapter.getItemViewType(i);
 
-            if(mTypeToView.indexOfKey(type) <0){
+            if (mTypeToView.indexOfKey(type) < 0) {
                 mTypeToView.put(type, new TypeViewInfo(type));
             }
 
@@ -674,6 +770,7 @@ public class BannerSwitch extends ViewGroup {
     // 设置适配器
     public void setAdapter(ListAdapter adapter) {
         if (mListAdapter == adapter) return;
+        cancelBanner();
         if (mListAdapter != null) {
             mListAdapter.unregisterDataSetObserver(mDataSetObserver);
         }
@@ -682,48 +779,73 @@ public class BannerSwitch extends ViewGroup {
             adapter.registerDataSetObserver(mDataSetObserver);
         }
         computeAdapter();
+
+        // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
+        if (mSwitchFixedItem > getChildCount()) {
+            mSelectIndex = Math.min(mSelectIndex, mSwitchFixedItem / 2);
+            mSelectIndex = Math.max(mSelectIndex, mSwitchFixedItem / 2 - getChildCount() + 1);
+        } else if (mSwitchEdge) {
+            mSelectIndex = Math.min(0, mSelectIndex);
+            mSelectIndex = Math.max(-getChildCount() + mSwitchFixedItem, mSelectIndex);
+        }
+        // ------------------------------------------------------------------------------------------------------------------------------//
+
+        tryAddAutoBanner();
     }
 
-    /**
-     * @param index           选中页面
-     * @param animation       是否滑动过渡
-     */
-    public void setSelectPage(int index, boolean animation){
+
+    private float[] getSelectCenter() {
+
+        float[] ret = new float[3];
+
+        int count = getChildCount();
+        float mCurrentIndex = (mSwitchFixedItem / 2 - mSelectIndex) % count;
+        mCurrentIndex = (mCurrentIndex + count) % count;
+
+        int mCurrentCenter = (int) Math.rint(mCurrentIndex);
+        float radio = mCurrentIndex - mCurrentCenter;
+        mCurrentCenter = mCurrentCenter > count - 1 + 0.5f ? 0 : mCurrentCenter;
+        radio = mCurrentCenter > count - 1 + 0.5f ? 1 - radio : radio;
+        ret[0] = mCurrentCenter;
+        ret[1] = radio;
+        ret[2] = mCurrentIndex;
+
+        return ret;
+    }
+
+    public int getSelectPage() {
+        float[] page = getSelectCenter();
+        return (int) page[0];
+    }
+
+
+    public void setSelectPage(int index, boolean animation) {
         if (mSwitchAnimator != null) {
             mSwitchAnimator.cancel();
             mSwitchAnimator = null;
         }
 
-        if(index == mSelectIndex){
+
+        float[] page = getSelectCenter();
+
+        if (index == page[0]) {
             return;
         }
 
-        if(animation){
-            mSwitchAnimator = ValueAnimator.ofFloat(mSelectIndex, index);
-            mSwitchAnimator.setDuration(Math.max(50, (int) Math.abs((mSelectIndex - index) * mSwitchAnimationPeriod) / mSwitchFixedItem));
-            mSwitchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    mSelectIndex = (float) animation.getAnimatedValue();
+        float step1 = page[0] - index;
+        float step2 = step1 - getChildCount();
+        float step3 = getChildCount() + step1;
 
-                    if (mSwitchEdge) {
-                        mSelectIndex = Math.min(0, mSelectIndex);
-                        mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
-                    }
+        float step = step1;
+        step = Math.abs(step) < Math.abs(step2) ? step : step2;
+        step = Math.abs(step) < Math.abs(step3) ? step : step3;
 
-                    ensureTranslationOrder();
-                }
-            });
-            mSwitchAnimator.start();
-            mSwitchEndTime = System.currentTimeMillis() + mSwitchAnimator.getDuration() + 50;
-        }else {
-            mSelectIndex = index;
-            if (mSwitchEdge) {
-                mSelectIndex = Math.min(0, mSelectIndex);
-                mSelectIndex = Math.max(-getChildCount() + 1, mSelectIndex);
-            }
-            ensureTranslationOrder();
+        startInternalPageFly(step, animation);
+
+        if (autoProgress != null) {
+            autoProgress.delay = true;
         }
+
 
     }
 
@@ -731,25 +853,18 @@ public class BannerSwitch extends ViewGroup {
         this.mOnItemClickListener = listener;
     }
 
-    public void setOnButtonLineScrollListener(OnButtonLineScrollListener listener) {
-        this.mOnButtonLineScrollListener = listener;
+    public void setOnButtonLineScrollListener(OnScrollListener listener) {
+        this.mOnScrollListener = listener;
     }
 
     public interface OnItemClickListener {
         void onItemClicked(int position, View view);
     }
 
-    public interface OnButtonLineScrollListener {
-        /**
-         * @param viewCount    当前View数量
-         * @param leftIndex    这边View 位置
-         * @param rightIndex   右边View 位置
-         * @param leftView     这边View
-         * @param rightView    右边View
-         * @param leftNearWei  中央位置接近 右边View 的尺度  0 表示远离； 1 表示重合
-         * @param rightNearWei 中央位置接近 右边View 的尺度  0 表示远离； 1 表示重合
-         */
-        void onButtonLineScroll(int viewCount, int leftIndex, int rightIndex, View leftView, View rightView, float leftNearWei, float rightNearWei);
+    public interface OnScrollListener {
+        //   void onButtonLineScroll(int viewCount, int leftIndex, int rightIndex, View leftView, View rightView, float leftNearWei, float rightNearWei);
+        void onPageScrolled(int position, float positionOffset);
+
     }
 
 }
