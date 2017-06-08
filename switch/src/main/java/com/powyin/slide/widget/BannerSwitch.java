@@ -853,6 +853,12 @@ public class BannerSwitch extends ViewGroup {
         this.mOnItemClickListener = listener;
     }
 
+    public void setEnableTouchScroll(boolean isEnable){
+        this.mTouchScrollEnable = isEnable;
+        setSelectPage(getSelectPage(),false);
+
+    }
+
     public void setOnButtonLineScrollListener(OnScrollListener listener) {
         this.mOnScrollListener = listener;
     }
