@@ -2,20 +2,20 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-version = "1.4.7"
+version = "1.5.0"
 
 android {
 
     resourcePrefix "powyin_switch" //随意填写
 
     compileSdkVersion 24
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '24.0.0'
 
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 147
-        versionName "14.7"
+        versionCode 150
+        versionName "15.0"
     }
     buildTypes {
         release {

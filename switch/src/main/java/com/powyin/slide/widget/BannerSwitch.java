@@ -50,8 +50,8 @@ public class BannerSwitch extends ViewGroup {
     private boolean mSwitchEdge;
     private int mSwitchPagePeriod;
     private int mSwitchAnimationPeriod;
-    private boolean mIsTouched;
     private float mSelectIndex;             // 横幅滚动轴；
+    private float scrollDirection;
 
 
     private ListAdapter mListAdapter;
@@ -235,11 +235,8 @@ public class BannerSwitch extends ViewGroup {
             return super.dispatchTouchEvent(ev);
         }
 
-        mIsTouched = true;
-
 
         if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-            mIsTouched = false;
             mIsMultipleFinger = false;
         }
 
@@ -303,11 +300,11 @@ public class BannerSwitch extends ViewGroup {
                     return false;
                 }
 
-                int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
-                float x = MotionEventCompat.getX(ev, pointerIndex);
+                int pointerIndex = ev.findPointerIndex( mActivePointerId);
+                float x = ev.getX( pointerIndex);
                 float dx = x - mLastMotionX;
                 float xDiff = Math.abs(dx);
-                float y = MotionEventCompat.getY(ev, pointerIndex);
+                float y = ev.getY(pointerIndex);
                 float yDiff = Math.abs(y - mInitialMotionY);
 
 
@@ -359,11 +356,11 @@ public class BannerSwitch extends ViewGroup {
             case MotionEvent.ACTION_MOVE:
                 if (!mIsBeingDragged) {
                     if (mActivePointerId == -1) return false;
-                    int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+                    int pointerIndex = ev.findPointerIndex( mActivePointerId);
                     if (pointerIndex < 0) return false;
 
-                    float x = MotionEventCompat.getX(ev, pointerIndex);
-                    float y = MotionEventCompat.getY(ev, pointerIndex);
+                    float x = ev.getX( pointerIndex);
+                    float y = ev.getY( pointerIndex);
 
                     final float xDiff = Math.abs(x - mLastMotionX);
 
@@ -387,15 +384,14 @@ public class BannerSwitch extends ViewGroup {
                         }
                     }
                 } else {
-                    if (mActivePointerId == -1) return false;
-                    int activePointerIndex = MotionEventCompat.findPointerIndex(
-                            ev, mActivePointerId);
+                    if (mActivePointerId < 0) return false;
+                    int activePointerIndex = ev.findPointerIndex(mActivePointerId);
                     if (activePointerIndex < 0) return false;
                     ViewParent parent = getParent();
                     if (parent != null) {
                         parent.requestDisallowInterceptTouchEvent(true);
                     }
-                    offsetScrollX(MotionEventCompat.getX(ev, activePointerIndex));
+                    offsetScrollX(ev.getX(activePointerIndex));
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -414,15 +410,15 @@ public class BannerSwitch extends ViewGroup {
                 break;
             case MotionEventCompat.ACTION_POINTER_DOWN: {
                 final int index = MotionEventCompat.getActionIndex(ev);
-                mLastMotionX = MotionEventCompat.getX(ev, index);
-                mActivePointerId = MotionEventCompat.getPointerId(ev, index);
+                mLastMotionX = ev.getX(index);
+                mActivePointerId = ev.getPointerId( index);
 
                 break;
             }
             case MotionEventCompat.ACTION_POINTER_UP:
                 onSecondaryPointerUp(ev);
-                mLastMotionX = MotionEventCompat.getX(ev,
-                        MotionEventCompat.findPointerIndex(ev, mActivePointerId));
+                mLastMotionX = ev.getX(
+                        ev.findPointerIndex( mActivePointerId));
                 break;
         }
 
@@ -468,7 +464,7 @@ public class BannerSwitch extends ViewGroup {
     }
 
     private boolean performItemClick() {
-        if (mOnItemClickListener != null && (mTouchTimeEnd - mTouchTimeBegin) < 650) {
+        if (mOnItemClickListener != null && (mTouchTimeEnd - mTouchTimeBegin) < 550) {
             for (int i = 0; i < getChildCount(); i++) {
                 Rect globeRect = new Rect();
                 View view = getChildAt(i);
@@ -528,17 +524,18 @@ public class BannerSwitch extends ViewGroup {
     // 多指介入
     private void onSecondaryPointerUp(MotionEvent ev) {
         final int pointerIndex = MotionEventCompat.getActionIndex(ev);
-        final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
+        final int pointerId = ev.getPointerId( pointerIndex);
         if (pointerId == mActivePointerId) {
             final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-            mLastMotionX = MotionEventCompat.getX(ev, newPointerIndex);
-            mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
+            mLastMotionX = ev.getX( newPointerIndex);
+            mActivePointerId = ev.getPointerId( newPointerIndex);
         }
     }
 
     // 界面位移
     private void offsetScrollX(float x) {
         float deltaX = mLastMotionX - x;
+        scrollDirection = deltaX != 0 ? deltaX : scrollDirection;
         mLastMotionX = x;
         float oldScrollX = getScrollX();
         float scrollX = oldScrollX + deltaX;
@@ -580,23 +577,21 @@ public class BannerSwitch extends ViewGroup {
             mSwitchAnimator.cancel();
             mSwitchAnimator = null;
         }
+
+        int left = (int) mSelectIndex + (mSelectIndex % 1 > 0 ? 1 : 0);
+        int righ = (int) mSelectIndex + (mSelectIndex % 1 > 0 ? 0 : -1);
+
         int mTarget;
 
         if (Math.abs(diff) < 0.05) {
             mTarget = (int) Math.rint(mSelectIndex);
-        } else if (mLastMotionX - mInitialMotionX > 0) {
-            if (Math.abs((int) mSelectIndex - mSelectIndex) > 0.5 && mSelectIndex < 0 || Math.abs((int) mSelectIndex - mSelectIndex) <= 0.5 && mSelectIndex > 0) {
-                mTarget = (int) (Math.rint(mSelectIndex) + 1);
-            } else {
-                mTarget = (int) (Math.rint(mSelectIndex));
-            }
+        } else if (scrollDirection<0) {
+            mTarget = left;
         } else {
-            if (Math.abs((int) mSelectIndex - mSelectIndex) > 0.5 && mSelectIndex < 0 || Math.abs((int) mSelectIndex - mSelectIndex) <= 0.5 && mSelectIndex > 0) {
-                mTarget = (int) (Math.rint(mSelectIndex));
-            } else {
-                mTarget = (int) (Math.rint(mSelectIndex) - 1);
-            }
+            mTarget = righ;
         }
+
+
 
         // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
         if (mSwitchFixedItem > getChildCount()) {
@@ -853,9 +848,9 @@ public class BannerSwitch extends ViewGroup {
         this.mOnItemClickListener = listener;
     }
 
-    public void setEnableTouchScroll(boolean isEnable){
+    public void setEnableTouchScroll(boolean isEnable) {
         this.mTouchScrollEnable = isEnable;
-        setSelectPage(getSelectPage(),false);
+        setSelectPage(getSelectPage(), false);
 
     }
 
