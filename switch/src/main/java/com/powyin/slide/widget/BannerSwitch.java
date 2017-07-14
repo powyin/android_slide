@@ -35,8 +35,8 @@ public class BannerSwitch extends ViewGroup {
     private float mInitialMotionX;
     private float mInitialMotionY;
 
-    private long mTouchTimeBegin;
-    private long mTouchTimeEnd;
+//    private long mTouchTimeBegin;
+//    private long mTouchTimeEnd;
 
     private int mActivePointerId = INVALID_POINTER;
     private static final int INVALID_POINTER = -1;
@@ -139,19 +139,6 @@ public class BannerSwitch extends ViewGroup {
 
     }
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
-        if (mSwitchFixedItem > getChildCount()) {
-            mSelectIndex = Math.min(mSelectIndex, mSwitchFixedItem / 2);
-            mSelectIndex = Math.max(mSelectIndex, mSwitchFixedItem / 2 - getChildCount() + 1);
-        } else if (mSwitchEdge) {
-            mSelectIndex = Math.min(0, mSelectIndex);
-            mSelectIndex = Math.max(-getChildCount() + mSwitchFixedItem, mSelectIndex);
-        }
-        // ------------------------------------------------------------------------------------------------------------------------------//
-    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -217,24 +204,8 @@ public class BannerSwitch extends ViewGroup {
             case MotionEvent.ACTION_DOWN:
                 mLastMotionX = mInitialMotionX = ev.getX();
                 mInitialMotionY = ev.getY();
-                mTouchTimeBegin = System.currentTimeMillis();
-
-                break;
-            case MotionEvent.ACTION_UP:
-                mTouchTimeEnd = System.currentTimeMillis();
-
-                break;
-            case MotionEvent.ACTION_CANCEL:
-
-                mTouchTimeEnd = System.currentTimeMillis() + 2000;
                 break;
         }
-
-
-        if (!mTouchScrollEnable) {
-            return super.dispatchTouchEvent(ev);
-        }
-
 
         if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
             mIsMultipleFinger = false;
@@ -254,8 +225,10 @@ public class BannerSwitch extends ViewGroup {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (!mTouchScrollEnable) {
-            return super.onInterceptTouchEvent(ev);
+        boolean superRet = super.onInterceptTouchEvent(ev);
+
+        if(!mTouchScrollEnable){
+            return superRet;
         }
 
         final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
@@ -342,8 +315,11 @@ public class BannerSwitch extends ViewGroup {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        if (!mTouchScrollEnable) {
-            return super.onTouchEvent(ev);
+
+        boolean superRet = super.onTouchEvent(ev);
+
+        if(!mTouchScrollEnable){
+            return superRet;
         }
 
         final int action = ev.getAction();
@@ -391,13 +367,15 @@ public class BannerSwitch extends ViewGroup {
                     if (parent != null) {
                         parent.requestDisallowInterceptTouchEvent(true);
                     }
+
                     offsetScrollX(ev.getX(activePointerIndex));
+
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchSlop && !mIsMultipleFinger) {
-                    performItemClick();
-                }
+//                if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchSlop && !mIsMultipleFinger) {
+//                    performItemClick();
+//                }
             case MotionEvent.ACTION_CANCEL:
                 if (mIsBeingDragged) {
                     startInternalTouchFly();
@@ -463,8 +441,9 @@ public class BannerSwitch extends ViewGroup {
         throw new RuntimeException("not support onClickListener");
     }
 
+
     private boolean performItemClick() {
-        if (mOnItemClickListener != null && (mTouchTimeEnd - mTouchTimeBegin) < 550) {
+        if (mOnItemClickListener != null) {
             for (int i = 0; i < getChildCount(); i++) {
                 Rect globeRect = new Rect();
                 View view = getChildAt(i);
@@ -545,16 +524,6 @@ public class BannerSwitch extends ViewGroup {
 
         mSelectIndex -= deltaX / pace;
 
-        // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
-        if (mSwitchFixedItem > getChildCount()) {
-            mSelectIndex = Math.min(mSelectIndex, mSwitchFixedItem / 2);
-            mSelectIndex = Math.max(mSelectIndex, mSwitchFixedItem / 2 - getChildCount() + 1);
-        } else if (mSwitchEdge) {
-            mSelectIndex = Math.min(0, mSelectIndex);
-            mSelectIndex = Math.max(-getChildCount() + mSwitchFixedItem, mSelectIndex);
-        }
-        // ------------------------------------------------------------------------------------------------------------------------------//
-
 
         ensureTranslationOrder();
     }
@@ -593,17 +562,7 @@ public class BannerSwitch extends ViewGroup {
 
 
 
-        // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
-        if (mSwitchFixedItem > getChildCount()) {
-            mTarget = Math.min(mTarget, mSwitchFixedItem / 2);
-            mTarget = Math.max(mTarget, mSwitchFixedItem / 2 - getChildCount() + 1);
-        } else if (mSwitchEdge) {
-            mTarget = Math.min(0, mTarget);
-            mTarget = Math.max(-getChildCount() + mSwitchFixedItem, mTarget);
-        }
-
         if (mSelectIndex - Math.rint(mTarget) == 0) return;
-        // ------------------------------------------------------------------------------------------------------------------------------//
 
         final ValueAnimator current = ValueAnimator.ofFloat(mSelectIndex, mTarget);
         mSwitchAnimator = current;
@@ -632,21 +591,6 @@ public class BannerSwitch extends ViewGroup {
         }
 
         float mTarget = (int) (Math.rint(mSelectIndex + step));
-
-
-        // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
-        if (mSwitchFixedItem > getChildCount()) {
-            mTarget = Math.min(mTarget, mSwitchFixedItem / 2);
-
-            mTarget = Math.max(mTarget, mSwitchFixedItem / 2 - getChildCount() + 1);
-
-        } else if (mSwitchEdge) {
-            mTarget = Math.min(0, mTarget);
-            mTarget = Math.max(-getChildCount() + mSwitchFixedItem, mTarget);
-        }
-
-
-        // ------------------------------------------------------------------------------------------------------------------------------//
 
         if (animation) {
             final ValueAnimator current = ValueAnimator.ofFloat(mSelectIndex, mTarget);
@@ -774,17 +718,6 @@ public class BannerSwitch extends ViewGroup {
             adapter.registerDataSetObserver(mDataSetObserver);
         }
         computeAdapter();
-
-        // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
-        if (mSwitchFixedItem > getChildCount()) {
-            mSelectIndex = Math.min(mSelectIndex, mSwitchFixedItem / 2);
-            mSelectIndex = Math.max(mSelectIndex, mSwitchFixedItem / 2 - getChildCount() + 1);
-        } else if (mSwitchEdge) {
-            mSelectIndex = Math.min(0, mSelectIndex);
-            mSelectIndex = Math.max(-getChildCount() + mSwitchFixedItem, mSelectIndex);
-        }
-        // ------------------------------------------------------------------------------------------------------------------------------//
-
         tryAddAutoBanner();
     }
 
@@ -828,8 +761,8 @@ public class BannerSwitch extends ViewGroup {
         }
 
         float step1 = page[0] - index;
-        float step2 = step1 - getChildCount();
-        float step3 = getChildCount() + step1;
+        float step2 = Math.max(mSwitchFixedItem,getChildCount()) + step1;
+        float step3 = step1 - Math.max(mSwitchFixedItem,getChildCount());
 
         float step = step1;
         step = Math.abs(step) < Math.abs(step2) ? step : step2;
@@ -846,6 +779,12 @@ public class BannerSwitch extends ViewGroup {
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.mOnItemClickListener = listener;
+        super.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performItemClick();
+            }
+        });
     }
 
     public void setEnableTouchScroll(boolean isEnable) {
