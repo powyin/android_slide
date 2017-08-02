@@ -5,7 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.powyin.slide.widget.BannerSwitch;
-import com.powyin.slide.widget.BannerUpperView;
+import com.powyin.slide.widget.BannerUpperCircleView;
+import com.powyin.slide.widget.BannerUpperRectView;
 
 import java.util.Random;
 
@@ -16,7 +17,7 @@ public class SimpleBannerSwitch_Banner_1 extends Activity {
 
 
     BannerSwitch bannerSwitch;
-    BannerUpperView bannerUpperView;
+    BannerUpperCircleView bannerUpperRectView;
     ListViewAdapter adapter;
 
 
@@ -28,15 +29,14 @@ public class SimpleBannerSwitch_Banner_1 extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple_banner_switch_banner_1);
         bannerSwitch = (BannerSwitch) findViewById(R.id.my_banner);
-        bannerUpperView = (BannerUpperView) findViewById(R.id.my_banner_upper_view);
+        bannerUpperRectView = (BannerUpperCircleView) findViewById(R.id.my_banner_upper_view);
 
         bannerSwitch.setOnButtonLineScrollListener(new BannerSwitch.OnScrollListener() {
             @Override
             public void onPageScrolled(int postion, float positionOffset) {
-                System.out.println("---------------------------->>>>>>1111111   "+postion + " "+positionOffset);
-
+                System.out.println("---------------------------->>>>>>1111111   "+postion + " --  "+positionOffset);
+                bannerUpperRectView.onButtonLineScroll(bannerSwitch.getChildCount(),postion,positionOffset);
             }
-
         });
 
 //        viewPager.setAdapter(new PagerAdapter() {
@@ -106,6 +106,13 @@ public class SimpleBannerSwitch_Banner_1 extends Activity {
                     adapter.reMoveItem();
                 }
                 break;
+
+            case R.id.select_to_index:
+
+                bannerSwitch.setSelectPage(0,true);
+
+                break;
+
         }
 
     }

@@ -3,12 +3,9 @@ package com.powyin.test;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.TextView;
 
 import com.powyin.slide.widget.BannerSwitch;
-import com.powyin.slide.widget.BannerUpperView;
+import com.powyin.slide.widget.BannerUpperRectView;
 
 /**
  * Created by powyin on 2016/8/7.
@@ -17,7 +14,7 @@ public class SimpleBannerSwitch_Banner_3 extends Activity {
 
 
     BannerSwitch bannerSwitch;
-    BannerUpperView bannerUpperView;
+    BannerUpperRectView bannerUpperRectView;
 
     ListViewAdapter adapter;
 
@@ -27,7 +24,7 @@ public class SimpleBannerSwitch_Banner_3 extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple_banner_switch_banner_3);
         bannerSwitch = (BannerSwitch) findViewById(R.id.my_banner);
-        bannerUpperView = (BannerUpperView) findViewById(R.id.my_banner_upper_view);
+        bannerUpperRectView = (BannerUpperRectView) findViewById(R.id.my_banner_upper_view);
 
         bannerSwitch.setOnItemClickListener(new BannerSwitch.OnItemClickListener() {
             @Override

@@ -19,8 +19,8 @@
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                >
+                android:layout_height="match_parent">
+
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -124,7 +124,7 @@
 
         </com.powyin.slide.widget.BannerSwitch>
 
-        <com.powyin.slide.widget.BannerUpperView
+        <com.powyin.slide.widget.BannerUpperCircleView
             android:id="@+id/my_banner_upper_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -136,6 +136,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <TextView
+            android:id="@+id/select_to_index"
+            android:onClick="onClick"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="100dp"
