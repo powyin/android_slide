@@ -35,7 +35,6 @@ public class PowSwitch extends View {
     private Drawable mSwitchBacOff;
     private Drawable mSwitchIconOn;
     private Drawable mSwitchIconOff;
-    private int mSwitchPadding;
     private int mSwitchSuggestWei;
     private int mSwitchSuggestHei;
     private Rect iconRect = new Rect();
@@ -73,7 +72,6 @@ public class PowSwitch extends View {
             mSwitchIconOn = context.getResources().getDrawable(R.drawable.powyin_switch_pow_switch_icon_on);
         }
 
-        mSwitchPadding = (int) (a.getDimension(R.styleable.PowSwitch_pow_switch_padding, (int) (2 * density)) + 0.5f);
 
         a.recycle();
 
@@ -96,20 +94,20 @@ public class PowSwitch extends View {
         int maxWei = 0;
         maxWei = Math.max(maxWei, mSwitchBacOff.getIntrinsicWidth());
         maxWei = Math.max(maxWei, mSwitchBacOn.getIntrinsicWidth());
-        maxWei = Math.max(maxWei, mSwitchIconOff.getIntrinsicWidth() + 2 * mSwitchPadding);
-        maxWei = Math.max(maxWei, mSwitchIconOn.getIntrinsicWidth() + 2 * mSwitchPadding);
+        maxWei = Math.max(maxWei, mSwitchIconOff.getIntrinsicWidth());
+        maxWei = Math.max(maxWei, mSwitchIconOn.getIntrinsicWidth());
         maxWei += getPaddingLeft() + getPaddingRight();
 
         int maxHei = 0;
         maxHei = Math.max(maxHei, mSwitchBacOff.getIntrinsicHeight());
         maxHei = Math.max(maxHei, mSwitchBacOn.getIntrinsicHeight());
-        maxHei = Math.max(maxHei, mSwitchIconOff.getIntrinsicHeight() + 2 * mSwitchPadding);
-        maxHei = Math.max(maxHei, mSwitchIconOn.getIntrinsicHeight() + 2 * mSwitchPadding);
+        maxHei = Math.max(maxHei, mSwitchIconOff.getIntrinsicHeight());
+        maxHei = Math.max(maxHei, mSwitchIconOn.getIntrinsicHeight());
         maxHei += getPaddingTop() + getPaddingBottom();
 
 
-        int minWei = 2 * mSwitchPadding + getPaddingTop() + getPaddingBottom();
-        int minHei = 2 * mSwitchPadding + getPaddingLeft() + getPaddingRight();
+        int minWei = getPaddingTop() + getPaddingBottom();
+        int minHei =  getPaddingLeft() + getPaddingRight();
 
         if (maxWei <= minHei) maxWei = mSwitchSuggestWei + minWei;
         if (maxHei <= minHei) maxHei = mSwitchSuggestHei + minHei;
@@ -129,20 +127,20 @@ public class PowSwitch extends View {
         bacRect.top = getPaddingTop();
         bacRect.bottom = getHeight() - getPaddingBottom();
 
-        iconRect.top = iconFixedRect.top = getPaddingTop() + mSwitchPadding;
-        iconRect.bottom = iconFixedRect.bottom = getHeight() - getPaddingBottom() - mSwitchPadding;
+        iconRect.top = iconFixedRect.top = getPaddingTop();
+        iconRect.bottom = iconFixedRect.bottom = getHeight() - getPaddingBottom();
 
         int maxWid = Math.max(0, Math.max(mSwitchIconOff.getIntrinsicWidth(), mSwitchIconOn.getIntrinsicWidth()));
         int maxHei = Math.max(0, Math.max(mSwitchIconOff.getIntrinsicHeight(), mSwitchIconOn.getIntrinsicHeight()));
 
-        iconFixedRect.left = getPaddingLeft() + mSwitchPadding;
+        iconFixedRect.left = getPaddingLeft();
         if (maxHei != 0 && maxWid != 0) {
             iconFixedRect.right = iconFixedRect.left + (int) (1f * maxWid / maxHei * (iconFixedRect.bottom - iconFixedRect.top));
         } else {
             iconFixedRect.right = iconFixedRect.left + iconFixedRect.bottom - iconFixedRect.top;
         }
 
-        targetMax = getWidth() - getPaddingRight() - getPaddingLeft() - 2 * mSwitchPadding - iconFixedRect.right + iconFixedRect.left;
+        targetMax = getWidth() - getPaddingRight() - getPaddingLeft() - iconFixedRect.right + iconFixedRect.left;
         targetMax = Math.max(targetMax, 0);
 
         targetCurrent = 0;
@@ -187,7 +185,7 @@ public class PowSwitch extends View {
             case MotionEvent.ACTION_DOWN: {
                 mLastMotionX = mInitialMotionX = ev.getX();
                 mInitialMotionY = ev.getY();
-                mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+                mActivePointerId = ev.getPointerId( 0);
                 break;
             }
             case MotionEvent.ACTION_MOVE:
@@ -195,11 +193,11 @@ public class PowSwitch extends View {
                     if (mActivePointerId == -1) {
                         return false;
                     }
-                    int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+                    int pointerIndex = ev.findPointerIndex(mActivePointerId);
                     if (pointerIndex < 0) {
                         return false;
                     }
-                    final float x = MotionEventCompat.getX(ev, pointerIndex);
+                    final float x = ev.getX(pointerIndex);
                     final float xDiff = Math.abs(x - mLastMotionX);
                     if (xDiff > mTouchSlop) {
                         mIsBeingDragged = true;
@@ -214,23 +212,26 @@ public class PowSwitch extends View {
                     if (mActivePointerId == -1) {
                         return false;
                     }
-                    int activePointerIndex = MotionEventCompat.findPointerIndex(
-                            ev, mActivePointerId);
+                    int activePointerIndex = ev.findPointerIndex( mActivePointerId);
                     if (activePointerIndex < 0) {
                         return false;
                     }
-                    offsetSwitch(MotionEventCompat.getX(ev, activePointerIndex));
+                    offsetSwitch(ev.getX( activePointerIndex));
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchSlop) {
                     if (mIsOpen && mInitialMotionX < getWidth() / 2) {
                         mIsOpen = false;
-                        invokeListener();
+                        if(mOnToggleListener!=null){
+                            mOnToggleListener.onToggle(mIsOpen);
+                        }
                         ensureTarget();
                     } else if (!mIsOpen && mInitialMotionX > getWidth() / 2) {
                         mIsOpen = true;
-                        invokeListener();
+                        if(mOnToggleListener!=null){
+                            mOnToggleListener.onToggle(mIsOpen);
+                        }
                         ensureTarget();
                     }
                 }
@@ -238,10 +239,14 @@ public class PowSwitch extends View {
                 if (mIsBeingDragged) {
                     if(mIsOpen && targetCurrent< targetMax/2){
                         mIsOpen = false;
-                        invokeListener();
+                        if(mOnToggleListener!=null){
+                            mOnToggleListener.onToggle(mIsOpen);
+                        }
                     }else if(!mIsOpen && targetCurrent>targetMax/2){
                         mIsOpen = true;
-                        invokeListener();
+                        if(mOnToggleListener!=null){
+                            mOnToggleListener.onToggle(mIsOpen);
+                        }
                     }
                     ensureTarget();
                 }
@@ -250,15 +255,15 @@ public class PowSwitch extends View {
                 break;
             case MotionEventCompat.ACTION_POINTER_DOWN: {
                 final int index = MotionEventCompat.getActionIndex(ev);
-                mLastMotionX = MotionEventCompat.getX(ev, index);
-                mActivePointerId = MotionEventCompat.getPointerId(ev, index);
+                mLastMotionX = ev.getX(index);
+                mActivePointerId = ev.getPointerId( index);
 
                 break;
             }
             case MotionEventCompat.ACTION_POINTER_UP:
                 onSecondaryPointerUp(ev);
-                mLastMotionX = MotionEventCompat.getX(ev,
-                        MotionEventCompat.findPointerIndex(ev, mActivePointerId));
+                mLastMotionX = ev.getX(
+                        ev.findPointerIndex(mActivePointerId));
                 break;
         }
 
@@ -283,11 +288,11 @@ public class PowSwitch extends View {
     // 多指介入
     private void onSecondaryPointerUp(MotionEvent ev) {
         final int pointerIndex = MotionEventCompat.getActionIndex(ev);
-        final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
+        final int pointerId = ev.getPointerId( pointerIndex);
         if (pointerId == mActivePointerId) {
             final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-            mLastMotionX = MotionEventCompat.getX(ev, newPointerIndex);
-            mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
+            mLastMotionX = ev.getX( newPointerIndex);
+            mActivePointerId = ev.getPointerId( newPointerIndex);
         }
     }
 
@@ -322,11 +327,7 @@ public class PowSwitch extends View {
 
 
 
-    private void invokeListener(){
-        if(mOnToggleListener!=null){
-            mOnToggleListener.onToggle(mIsOpen);
-        }
-    }
+
 
     //---------------------------------------------setting----------------------------------------------//
 
@@ -334,7 +335,6 @@ public class PowSwitch extends View {
     public void setOpen(boolean isOpen){
         if(mIsOpen != isOpen){
             mIsOpen = isOpen;
-            invokeListener();
             ensureTarget();
         }
     }

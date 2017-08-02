@@ -27,7 +27,6 @@
         <attr name="pow_switch_icon_off" format="reference"/>
         <attr name="pow_switch_bac_on" format="reference"/>
         <attr name="pow_switch_bac_off" format="reference"/>
-        <attr name="pow_switch_padding" format="dimension"/>
     </declare-styleable>
 
 

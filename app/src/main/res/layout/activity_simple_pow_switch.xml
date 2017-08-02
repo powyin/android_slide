@@ -20,7 +20,6 @@
         android:layout_width="50dp"
         android:layout_height="30dp"
         android:padding="5dp"
-        app:pow_switch_padding="2dp"
         app:pow_switch_bac_off="@drawable/type_0_switch_bac_off"
         app:pow_switch_bac_on="@drawable/type_0_switch_bac_on"
         app:pow_switch_icon_off="@drawable/type_0_switch_icon_off"
