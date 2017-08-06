@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-version = "2.0.0"
+version = "2.0.5"
 
 android {
 
@@ -14,8 +14,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 200
-        versionName "200"
+        versionCode 205
+        versionName "205"
     }
 
     buildTypes {
@@ -27,11 +27,8 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-//    compile 'com.android.support:appcompat-v7:24.1.1'
-//    compile 'com.android.support:design:24.1.1'
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:support-v4:24.0.0'
 }
 
 def siteUrl = 'https://github.com/powyin/slide'                  // 项目的主页

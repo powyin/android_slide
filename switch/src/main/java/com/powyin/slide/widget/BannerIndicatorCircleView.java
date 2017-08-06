@@ -10,14 +10,14 @@ import android.view.View;
  * Created by powyin on 2017/8/3.
  */
 
-public class BannerUpperCircleView extends View {
+public class BannerIndicatorCircleView extends View {
 
 
-    public BannerUpperCircleView(Context context, AttributeSet attrs) {
+    public BannerIndicatorCircleView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public BannerUpperCircleView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public BannerIndicatorCircleView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mRectUnSelect = new Paint();
         mRectUnSelect.setStyle(Paint.Style.FILL);

@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v4.view.ViewCompat;
@@ -40,16 +41,17 @@ public class SlideSwitch extends ViewGroup {
     private VelocityTracker mVelocityTracker;
     private boolean mIsBeingDragged;
     private boolean mIsUnableToDrag;
-    private boolean mIsMultipleFinger;
+
+    float mInitialMotionX;
+    float mInitialMotionY;
+
     private int mTouchSlop;
     private float mLastMotionX;
-    private float mInitialMotionX;
-    private float mInitialMotionY;
     private int mActivePointerId = INVALID_POINTER;
     private static final int INVALID_POINTER = -1;
     private int mMaximumVelocity;
     private ValueAnimator valueAnimator;
-    private int mMaxWid;
+    private int mMaxWid;                                                  //最大布局宽度
     private float mSelectIndex = 0;
     private Drawable mSelectDrawable;                                     //选择区域显示
     private Drawable mSelectDrawableBac;                                  //选择区域背景
@@ -60,18 +62,12 @@ public class SlideSwitch extends ViewGroup {
     private Rect mSelectDrawableRectBac = new Rect();                     //选择区域背景 边界
     private Path mSelectDrawablePath = new Path();                        //选择区域背景 绘制边界
     private List<View> mMatchParentChildren = new ArrayList<>();
+
     private OnItemClickListener mOnItemClickListener;
-    private OnButtonLineScrollListener mOnButtonLineScrollListener;
-    private ListAdapter mListAdapter;
+    private OnScrollListener mOnScrollListener;
+
     Map<Integer, TypeViewInfo> mTypeToView = new HashMap<>();
 
-    private final DataSetObserver mDataSetObserver = new DataSetObserver() {
-        @Override
-        public void onChanged() {
-            refreshAdapter();
-        }
-
-    };
 
     private class TypeViewInfo {
         Integer mType;
@@ -105,7 +101,7 @@ public class SlideSwitch extends ViewGroup {
         if (mSelectDrawableBac == null) {
             mSelectDrawableBac = context.getResources().getDrawable(R.drawable.powyin_switch_slide_switch_select_bac);
         }
-        mSelectHei = (int)a.getDimension(R.styleable.SlideSwitch_pow_checked_hei, (int)(3.5*density));
+        mSelectHei = (int) a.getDimension(R.styleable.SlideSwitch_pow_checked_hei, (int) (3.5 * density));
         mSelectMaxItem = a.getInt(R.styleable.SlideSwitch_pow_fixed_item, -1);
         mSelectShowOverScroll = a.getBoolean(R.styleable.SlideSwitch_pow_show_over_scroll, false);
         a.recycle();
@@ -140,8 +136,6 @@ public class SlideSwitch extends ViewGroup {
                     }
                 }
             }
-            maxWidth += getPaddingLeft() + getPaddingRight();
-            maxHeight += getPaddingTop() + getPaddingBottom();
 
             maxHeight = Math.max(maxHeight, getSuggestedMinimumHeight() - mSelectHei);
             maxWidth = Math.max(maxWidth, getSuggestedMinimumWidth());
@@ -155,21 +149,19 @@ public class SlideSwitch extends ViewGroup {
                 final MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
 
                 final int childWidthMeasureSpec = getChildMeasureSpec(widthMeasureSpec,
-                        getPaddingLeft() + getPaddingRight() +
-                                lp.leftMargin + lp.rightMargin,
+                        lp.leftMargin + lp.rightMargin,
                         lp.width);
                 final int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
                         Math.max(0, getMeasuredHeight() - mSelectHei
-                                - getPaddingTop() - getPaddingBottom()
                                 - lp.topMargin - lp.bottomMargin), MeasureSpec.EXACTLY);
                 child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
             }
 
         } else {
             int widthMeasure = MeasureSpec.getSize(widthMeasureSpec);
-            float pace = (1f / (mSelectMaxItem) * (widthMeasure - getPaddingLeft() - getPaddingRight()));
+            float pace = (1f / (mSelectMaxItem) * (widthMeasure));
             int speWidthMeasure = MeasureSpec.makeMeasureSpec((int) pace, MeasureSpec.EXACTLY);
-            int usedHei = getPaddingTop() + getPaddingBottom() + mSelectHei;
+            int usedHei = mSelectHei;
             for (int i = 0; i < count; i++) {
                 final View child = getChildAt(i);
                 LayoutParams lp = (LayoutParams) child.getLayoutParams();
@@ -183,7 +175,7 @@ public class SlideSwitch extends ViewGroup {
                     mMatchParentChildren.add(child);
                 }
             }
-            maxHeight += getPaddingTop() + getPaddingBottom();
+
             maxHeight = Math.max(maxHeight, getSuggestedMinimumHeight() - mSelectHei);
 
             // 设置测量大小
@@ -196,7 +188,6 @@ public class SlideSwitch extends ViewGroup {
 
                 final int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
                         Math.max(0, getMeasuredHeight()
-                                - getPaddingTop() - getPaddingBottom()
                                 - lp.topMargin - lp.bottomMargin - mSelectHei), MeasureSpec.EXACTLY);
                 child.measure(speWidthMeasure, childHeightMeasureSpec);
             }
@@ -205,8 +196,8 @@ public class SlideSwitch extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int childTop = getPaddingTop();
-        int childLeft = getPaddingLeft();
+        int childTop = 0;
+        int childLeft = 0;
         final int count = getChildCount();
         if (mSelectMaxItem <= 0) {
             for (int i = 0; i < count; i++) {
@@ -220,10 +211,10 @@ public class SlideSwitch extends ViewGroup {
                         childWidth + childLeft, childHeight + childTop);
                 childLeft += childWidth + lp.rightMargin;
             }
-            mMaxWid = childLeft - getPaddingLeft();
+            mMaxWid = childLeft;
         } else {
-            float pace = 1f / (mSelectMaxItem) * (r - l - getPaddingLeft() - getPaddingRight());
-            int paddingLeft = getPaddingLeft();
+            float pace = 1f / (mSelectMaxItem) * (r - l);
+            int paddingLeft = 0;
             for (int i = 0; i < count; i++) {
                 View child = getChildAt(i);
                 int childHeight = child.getMeasuredHeight();
@@ -231,8 +222,9 @@ public class SlideSwitch extends ViewGroup {
                         (LayoutParams) child.getLayoutParams();
                 child.layout(paddingLeft + (int) (i * pace) + lp.leftMargin, childTop, paddingLeft + (int) ((i + 1) * pace) - lp.rightMargin, childHeight + childTop);
             }
-            mMaxWid = Math.max(getWidth() - getPaddingLeft() - getPaddingRight(), (int) (pace * (count)));
+            mMaxWid = Math.max(getWidth(), (int) (pace * (count)));
         }
+
         calculationRect(true);
     }
 
@@ -256,34 +248,20 @@ public class SlideSwitch extends ViewGroup {
         super.dispatchDraw(canvas);
     }
 
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
 
-        final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
-
-        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-            mIsMultipleFinger = false;
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            mInitialMotionX = ev.getX();
+            mInitialMotionY = ev.getY();
         }
-
-        if (action == MotionEvent.ACTION_POINTER_DOWN) {
-            mIsMultipleFinger = true;
-        }
-
         return super.dispatchTouchEvent(ev);
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
-        if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
-            mIsBeingDragged = false;
-            mIsUnableToDrag = false;
-            mActivePointerId = INVALID_POINTER;
-            if (mVelocityTracker != null) {
-                mVelocityTracker.clear();
-            }
-            return false;
-        }
 
         if (action != MotionEvent.ACTION_DOWN) {
             if (mIsBeingDragged) {
@@ -296,143 +274,181 @@ public class SlideSwitch extends ViewGroup {
 
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
-                mLastMotionX = mInitialMotionX = ev.getX();
-                mInitialMotionY = ev.getY();
-                mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+                mLastMotionX = ev.getX();
+                mActivePointerId = ev.getPointerId(0);
                 mIsUnableToDrag = false;
 
                 if (!mScroller.isFinished() && mScroller.computeScrollOffset()) {
                     mScroller.abortAnimation();
                     mIsBeingDragged = true;
-                    requestParentDisallowInterceptTouchEvent(true);
+
+                    if (mVelocityTracker == null) {
+                        mVelocityTracker = VelocityTracker.obtain();
+                    } else {
+                        mVelocityTracker.clear();
+                    }
+
+                    setScrollingCacheEnabled(true);
+                    ViewParent parent = getParent();
+                    if (parent != null) {
+                        parent.requestDisallowInterceptTouchEvent(true);
+                    }
                 } else {
                     mIsBeingDragged = false;
                 }
                 break;
             }
+            case MotionEventCompat.ACTION_POINTER_DOWN: {
+                final int index = MotionEventCompat.getActionIndex(ev);
+                mLastMotionX = ev.getX(index);
+                mActivePointerId = ev.getPointerId(index);
+                break;
+            }
+            case MotionEventCompat.ACTION_POINTER_UP:
+                final int actionPointerIndex = MotionEventCompat.getActionIndex(ev);
+                final int pointerId = ev.getPointerId(actionPointerIndex);
+                if (pointerId == mActivePointerId) {
+                    final int newPointerIndex = actionPointerIndex == 0 ? 1 : 0;
+                    mLastMotionX = ev.getX(newPointerIndex);
+                    mActivePointerId = ev.getPointerId(newPointerIndex);
 
-            case MotionEvent.ACTION_MOVE: {
-                if (mActivePointerId == -1) {
-                    return false;
+                    if (mVelocityTracker != null) {
+                        mVelocityTracker.clear();
+                    }
+
                 }
-
-                int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
-                float x = MotionEventCompat.getX(ev, pointerIndex);
+                break;
+            case MotionEvent.ACTION_MOVE: {
+                int pointerIndex = ev.findPointerIndex(mActivePointerId);
+                float x = ev.getX(pointerIndex);
                 float dx = x - mLastMotionX;
                 float xDiff = Math.abs(dx);
-                float y = MotionEventCompat.getY(ev, pointerIndex);
-                float yDiff = Math.abs(y - mInitialMotionY);
 
-                if (xDiff > mTouchSlop && xDiff * 0.5f > yDiff) {
+                if (xDiff > mTouchSlop) {
                     mIsBeingDragged = true;
-                    requestParentDisallowInterceptTouchEvent(true);
-                    mLastMotionX = dx > 0 ? mInitialMotionX + mTouchSlop :
-                            mInitialMotionX - mTouchSlop;
+                    if (mVelocityTracker == null) {
+                        mVelocityTracker = VelocityTracker.obtain();
+                    } else {
+                        mVelocityTracker.clear();
+                    }
+                    mLastMotionX = x;
                     setScrollingCacheEnabled(true);
-                } else if (yDiff > mTouchSlop) {
-                    mIsUnableToDrag = true;
-                }
-
-                if (mIsBeingDragged) {
-                    offsetScrollX(x);
+                    ViewParent parent = getParent();
+                    if (parent != null) {
+                        parent.requestDisallowInterceptTouchEvent(true);
+                    }
                 }
 
                 break;
             }
-
-            case MotionEventCompat.ACTION_POINTER_UP:
-                onSecondaryPointerUp(ev);
-                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                mIsBeingDragged = false;
+                mIsUnableToDrag = false;
+                mActivePointerId = INVALID_POINTER;
+                if (mVelocityTracker != null) {
+                    mVelocityTracker.recycle();
+                    mVelocityTracker = null;
+                }
+                return false;
         }
 
-        if (mVelocityTracker == null) {
-            mVelocityTracker = VelocityTracker.obtain();
+        if (mVelocityTracker != null) {
+            mVelocityTracker.addMovement(ev);
         }
-        mVelocityTracker.addMovement(ev);
+
 
         return mIsBeingDragged;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        if (mVelocityTracker == null) {
-            mVelocityTracker = VelocityTracker.obtain();
-        }
-        mVelocityTracker.addMovement(ev);
+        super.onTouchEvent(ev);
 
         final int action = ev.getAction();
 
         switch (action & MotionEventCompat.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN: {
-
-                mLastMotionX = mInitialMotionX = ev.getX();
-                mInitialMotionY = ev.getY();
-                mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+                mLastMotionX = ev.getX();
+                mActivePointerId = ev.getPointerId(0);
                 break;
             }
+            case MotionEventCompat.ACTION_POINTER_DOWN: {
+                final int index = MotionEventCompat.getActionIndex(ev);
+                mLastMotionX = ev.getX(index);
+                mActivePointerId = ev.getPointerId(index);
+                break;
+            }
+
+            case MotionEventCompat.ACTION_POINTER_UP:
+                final int actionPointerIndex = MotionEventCompat.getActionIndex(ev);
+                final int pointerId = ev.getPointerId(actionPointerIndex);
+                if (pointerId == mActivePointerId) {
+                    final int newPointerIndex = actionPointerIndex == 0 ? 1 : 0;
+                    mLastMotionX = ev.getX(newPointerIndex);
+                    mActivePointerId = ev.getPointerId(newPointerIndex);
+                    if (mVelocityTracker != null) {
+                        mVelocityTracker.clear();
+                    }
+                }
+                break;
+
             case MotionEvent.ACTION_MOVE:
                 if (!mIsBeingDragged) {                                                                              // just in case
-                    if (mActivePointerId == -1) return false;
-                    int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
-                    if (pointerIndex < 0) return false;
-                    final float x = MotionEventCompat.getX(ev, pointerIndex);
+                    int pointerIndex = ev.findPointerIndex(mActivePointerId);
+                    final float x = ev.getX(pointerIndex);
                     final float xDiff = Math.abs(x - mLastMotionX);
                     if (xDiff > mTouchSlop) {
                         mIsBeingDragged = true;
-                        requestParentDisallowInterceptTouchEvent(true);
-                        mLastMotionX = x - mInitialMotionX > 0 ? mInitialMotionX + mTouchSlop :
-                                mInitialMotionX - mTouchSlop;
-                        setScrollingCacheEnabled(true);
 
+                        if (mVelocityTracker == null) {
+                            mVelocityTracker = VelocityTracker.obtain();
+                        } else {
+                            mVelocityTracker.clear();
+                        }
+
+                        mLastMotionX = x;
+                        setScrollingCacheEnabled(true);
                         ViewParent parent = getParent();
                         if (parent != null) {
                             parent.requestDisallowInterceptTouchEvent(true);
                         }
                     }
                 } else {
-                    if (mActivePointerId == -1) return false;
-                    int activePointerIndex = MotionEventCompat.findPointerIndex(
-                            ev, mActivePointerId);
-                    if (activePointerIndex < 0) return false;
-                    ViewParent parent = getParent();
-                    if (parent != null) {
-                        parent.requestDisallowInterceptTouchEvent(true);
-                    }
-                    offsetScrollX(MotionEventCompat.getX(ev, activePointerIndex));
+                    int activePointerIndex = ev.findPointerIndex(mActivePointerId);
+                    offsetScrollX(ev.getX(activePointerIndex));
+                    mLastMotionX = ev.getX(activePointerIndex);
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchSlop && !mIsMultipleFinger) {
-                    performItemClick();
-                }
             case MotionEvent.ACTION_CANCEL:
                 if (mIsBeingDragged) {
                     startInternalFly();
                     ViewCompat.postInvalidateOnAnimation(this);
                 }
-                mActivePointerId = INVALID_POINTER;
-                mVelocityTracker.clear();
                 mIsBeingDragged = false;
-                break;
-            case MotionEventCompat.ACTION_POINTER_DOWN: {
-                final int index = MotionEventCompat.getActionIndex(ev);
-                mLastMotionX = MotionEventCompat.getX(ev, index);
-                mActivePointerId = MotionEventCompat.getPointerId(ev, index);
+                mIsUnableToDrag = false;
+                mActivePointerId = INVALID_POINTER;
 
-                break;
-            }
-            case MotionEventCompat.ACTION_POINTER_UP:
-                onSecondaryPointerUp(ev);
-                mLastMotionX = MotionEventCompat.getX(ev,
-                        MotionEventCompat.findPointerIndex(ev, mActivePointerId));
-                break;
+                if (mVelocityTracker != null) {
+                    mVelocityTracker.recycle();
+                    mVelocityTracker = null;
+                }
+
+                return true;
         }
+
+        if (mVelocityTracker != null) {
+            mVelocityTracker.addMovement(ev);
+        }
+
 
         return true;
     }
 
 
-    private boolean performItemClick() {
+    @Override
+    public boolean performClick() {
         for (int i = 0; i < getChildCount(); i++) {
             Rect globeRect = new Rect();
             View view = getChildAt(i);
@@ -445,14 +461,18 @@ public class SlideSwitch extends ViewGroup {
                 if (mSelectIndex != i) {
                     preformItemSelectAnimationClick(i);
                     if (mOnItemClickListener != null) {
-                        mOnItemClickListener.onItemClicked(i);
+                        mOnItemClickListener.onItemClicked(i, view);
                     }
                 }
                 break;
             }
         }
-
         return true;
+    }
+
+    @Override
+    public void setOnClickListener(@Nullable OnClickListener l) {
+        throw new RuntimeException("not support");
     }
 
     @Override
@@ -469,38 +489,19 @@ public class SlideSwitch extends ViewGroup {
         }
     }
 
-    // 取消父类打断触摸事件传递
-    private void requestParentDisallowInterceptTouchEvent(boolean disallowIntercept) {
-        final ViewParent parent = getParent();
-        if (parent != null) {
-            parent.requestDisallowInterceptTouchEvent(disallowIntercept);
-        }
-    }
-
-    // 多指介入
-    private void onSecondaryPointerUp(MotionEvent ev) {
-        final int pointerIndex = MotionEventCompat.getActionIndex(ev);
-        final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
-        if (pointerId == mActivePointerId) {
-            final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-            mLastMotionX = MotionEventCompat.getX(ev, newPointerIndex);
-            mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
-            if (mVelocityTracker != null) {
-                mVelocityTracker.clear();
-            }
-        }
-    }
 
     private void offsetScrollX(float x) {
         float deltaX = mLastMotionX - x;
         mLastMotionX = x;
         float oldScrollX = getScrollX();
         float scrollX = oldScrollX + deltaX;
-        mLastMotionX += scrollX - (int) scrollX;
 
-        int maxScroll = mMaxWid + getPaddingLeft() + getPaddingRight() - getWidth();
+        int maxScroll = mMaxWid - getWidth();
+        maxScroll = maxScroll > 0 ? maxScroll : 0;
+
         if (!mSelectShowOverScroll) {
-            scrollX = Math.min(Math.max(scrollX, 0), maxScroll);
+            scrollX = scrollX > 0 ? scrollX : 0;
+            scrollX = scrollX < maxScroll ? scrollX : 0;
         } else if (scrollX < 0) {
             //加入滑动阻尼系数
             int maxLen = getWidth() / 3;
@@ -527,18 +528,20 @@ public class SlideSwitch extends ViewGroup {
     }
 
     private void startInternalFly() {
+        mScroller.abortAnimation();
 
         mVelocityTracker.computeCurrentVelocity(500, mMaximumVelocity);
         int initialVelocity = (int) VelocityTrackerCompat.getXVelocity(
                 mVelocityTracker, mActivePointerId);
 
         int scrollX = getScrollX();
-        int maxScrollX = mMaxWid + getPaddingLeft() + getPaddingRight() - getWidth();
-        mScroller.abortAnimation();
+        int maxScrollX = mMaxWid - getWidth();
+        maxScrollX = maxScrollX > 0 ? maxScrollX : 0;
+
         if (scrollX < 0) {
-            mScroller.startScroll(scrollX, 0, 0 - scrollX, 0, 450);
+            mScroller.startScroll(scrollX, 0, 0 - scrollX, 0, 350);
         } else if (scrollX > maxScrollX) {
-            mScroller.startScroll(scrollX, 0, maxScrollX - scrollX, 0, 450);
+            mScroller.startScroll(scrollX, 0, maxScrollX - scrollX, 0, 350);
         } else {
             mScroller.fling(getScrollX(), 0, -initialVelocity, 0, 0, maxScrollX, 0, 0);
         }
@@ -548,17 +551,19 @@ public class SlideSwitch extends ViewGroup {
     private void preformItemSelectAnimationClick(int targetIndex) {
         if (targetIndex < 0 || targetIndex >= getChildCount()) return;
 
-        if (targetIndex != mSelectIndex && Math.abs(targetIndex - mSelectIndex) > 0.1f) {
+        if (targetIndex != mSelectIndex) {
             if (valueAnimator != null) valueAnimator.cancel();
 
             View targetView = getChildAt((targetIndex));
             int center = targetView.getLeft() / 2 + targetView.getRight() / 2;
-            int temTargetX = -getWidth() / 2 - getPaddingLeft() / 2 + getPaddingRight() / 2 + center;
+            int targetScrollX = -getWidth() / 2 + center;
+            targetScrollX = targetScrollX > 0 ? targetScrollX : 0;
 
-            int startScrollX = getScrollX();
-            int endScrollX = Math.min(Math.max(temTargetX, 0), mMaxWid + getPaddingLeft() + getPaddingRight() - getWidth());
+            int maxScroll = mMaxWid - getWidth();
+            maxScroll = maxScroll > 0 ? maxScroll : 0;
+            targetScrollX = targetScrollX < maxScroll ? targetScrollX : maxScroll;
 
-            PropertyValuesHolder valuesHolderScrollX = PropertyValuesHolder.ofInt("scrollX", startScrollX, endScrollX);
+            PropertyValuesHolder valuesHolderScrollX = PropertyValuesHolder.ofInt("scrollX", getScrollX(), targetScrollX);
             PropertyValuesHolder valuesHolderSelectIndex = PropertyValuesHolder.ofFloat("scrollRadio", mSelectIndex, targetIndex);
 
             valueAnimator = ValueAnimator.ofPropertyValuesHolder(valuesHolderScrollX, valuesHolderSelectIndex);
@@ -566,14 +571,11 @@ public class SlideSwitch extends ViewGroup {
             valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
-
                     int mScrollX = (int) animation.getAnimatedValue("scrollX");
                     mSelectIndex = (float) animation.getAnimatedValue("scrollRadio");
-
                     if (getScrollX() != mScrollX) {
                         scrollTo(mScrollX, 0);
                     }
-
                     calculationRect(false);
 
                 }
@@ -584,15 +586,13 @@ public class SlideSwitch extends ViewGroup {
 
     // 动态计算位置；
     private void calculationRect(boolean reSizeBound) {
-        if (mSelectDrawable != null && mSelectIndex >= 0 && mSelectIndex + 1 <= getChildCount()) {
+        if (mSelectDrawable != null && mSelectIndex >= 0 && mSelectIndex <= getChildCount() - 1) {
 
-            int count = getChildCount();
             int locLeft = (int) mSelectIndex;
             int locRight = locLeft + 1;
-            float diff = mSelectIndex - locLeft;
 
             View originView = getChildAt(locLeft);
-            View targetView = getChildAt(locRight);
+            View targetView = locRight < getChildCount() ? getChildAt(locRight) : null;
 
             int c_left = targetView != null ? targetView.getLeft() - originView.getLeft() : 0;
             int c_right = targetView != null ? targetView.getRight() - originView.getRight() : 0;
@@ -600,15 +600,15 @@ public class SlideSwitch extends ViewGroup {
             int oldLeft = mSelectDrawableRect.left;
             int oldRight = mSelectDrawableRect.right;
 
-            mSelectDrawableRect.top = getHeight() - getPaddingBottom() - mSelectHei;
+            mSelectDrawableRect.top = getHeight() - mSelectHei;
             mSelectDrawableRect.bottom = mSelectDrawableRect.top + mSelectHei;
-            mSelectDrawableRect.left = (int) ((originView.getLeft() + c_left * diff));
-            mSelectDrawableRect.right = (int) ((originView.getRight()) + c_right * diff);
+            mSelectDrawableRect.left = (int) ((originView.getLeft() + c_left * (mSelectIndex - locLeft)));
+            mSelectDrawableRect.right = (int) ((originView.getRight()) + c_right * (mSelectIndex - locLeft));
 
             if (oldLeft != mSelectDrawableRect.left || oldRight != mSelectDrawableRect.right) {
-                if (mOnButtonLineScrollListener != null) {
-                    mOnButtonLineScrollListener.onButtonLineScroll(
-                            count, locLeft, locRight, getChildAt(locLeft), getChildAt(locRight), 1 - diff, diff);
+                if (mOnScrollListener != null) {
+                    int center = (int) Math.rint(mSelectIndex);
+                    mOnScrollListener.onPageScrolled(center, mSelectIndex - center);
                 }
                 ViewCompat.postInvalidateOnAnimation(SlideSwitch.this);
             }
@@ -616,50 +616,67 @@ public class SlideSwitch extends ViewGroup {
         }
         if (reSizeBound) {
             mSelectDrawablePath.reset();
-            mSelectDrawablePath.addRect(getPaddingLeft(), getPaddingTop(), mMaxWid + getPaddingLeft(), getHeight() - getPaddingBottom(), Path.Direction.CCW);
+            mSelectDrawablePath.addRect(0, 0, mMaxWid, getHeight(), Path.Direction.CCW);
             mSelectDrawablePath.close();
-            mSelectDrawableRectBac.top = getHeight() - getPaddingBottom() - mSelectHei;
+            mSelectDrawableRectBac.top = getHeight() - mSelectHei;
             mSelectDrawableRectBac.bottom = mSelectDrawableRectBac.top + mSelectHei;
-            mSelectDrawableRectBac.left = getPaddingLeft();
-            mSelectDrawableRectBac.right = mMaxWid + getPaddingLeft();
+            mSelectDrawableRectBac.left = 0;
+            mSelectDrawableRectBac.right = mMaxWid;
         }
     }
 
 
     private ViewPager.OnPageChangeListener mViewPageChangeListener = new ViewPager.OnPageChangeListener() {
         boolean isDragTouch = false;                                                                          //是否手指触摸滚动
+        boolean needGetPosition;
+        float mFixedSelect;
         float mFixedPosition = 0;                                                                             //辅助记录手指触摸点信息；
         int mFixedScrollX = 0;                                                                                //辅助记录手指触摸点信息；
-        boolean mIsJustBegin = true;                                                                          //辅助记录手指触摸点信息；
 
         @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        public void onPageScrolled(int position, float selectIndexOffset, int positionOffsetPixels) {
             if (!isDragTouch) return;
-            if (mScroller != null) mScroller.abortAnimation();
-            if (valueAnimator != null) valueAnimator.cancel();
-            if (mIsJustBegin) {
-                mFixedPosition = position + positionOffset;
-                mIsJustBegin = false;
+
+            if (needGetPosition) {
+                mFixedSelect = position + selectIndexOffset;
+                needGetPosition = false;
             }
 
-            mSelectIndex = position + positionOffset;
+            if (mScroller != null) mScroller.abortAnimation();
+            if (valueAnimator != null) valueAnimator.cancel();
 
-            mSelectIndex = Math.min(mSelectIndex, getChildCount() - 1);
-            mSelectIndex = Math.max(mSelectIndex, 0);
 
-            calculationRect(false);
+            float targetSelectIndex = position + selectIndexOffset;
+            targetSelectIndex = Math.min(targetSelectIndex, getChildCount() - 1);
+            targetSelectIndex = targetSelectIndex < getChildCount() - 1 ? targetSelectIndex : getChildCount() - 1;
 
-            int targetScrollX = getScrollXByFloatWei(mSelectIndex);
-            float diff = Math.abs(mSelectIndex - mFixedPosition) > 0.5f ? 1 : Math.min(Math.abs((mSelectIndex - mFixedPosition) * 2), 1);
-            targetScrollX = (int) (diff * targetScrollX + (1 - diff) * mFixedScrollX);
+            int locLeft = (int) targetSelectIndex;
+            int locRight = locLeft + 1;
+            View originView = getChildAt(locLeft);
+            View targetView = locRight < getChildCount() ? getChildAt(locRight) : null;
+            int scrollLeft = (originView.getLeft() + originView.getRight()) / 2;
+            int scrollRight = targetView == null ? scrollLeft : (targetView.getLeft() + targetView.getRight()) / 2;
+            int targetScrollX = (int) (scrollLeft + (targetSelectIndex - locLeft) * (scrollRight - scrollLeft));
+            targetScrollX -= getWidth() / 2;
+            targetScrollX = targetScrollX > 0 ? targetScrollX : 0;
+
+            selectIndexOffset = targetSelectIndex - mFixedSelect;
+            selectIndexOffset = selectIndexOffset < 0 ? -selectIndexOffset : selectIndexOffset;
+
+            targetScrollX = (int) (mFixedScrollX + (targetScrollX - mFixedScrollX) * selectIndexOffset);
+            mSelectIndex = mFixedPosition + (targetSelectIndex - mFixedPosition) * selectIndexOffset;
 
             if (targetScrollX != getScrollX()) {
                 scrollTo(targetScrollX, 0);
             }
+
+            calculationRect(false);
         }
 
         @Override
         public void onPageSelected(int position) {
+
+
         }
 
         @Override
@@ -667,114 +684,21 @@ public class SlideSwitch extends ViewGroup {
             switch (state) {
                 case ViewPager.SCROLL_STATE_DRAGGING:     // 开始用户拖拉
                     isDragTouch = true;
+                    needGetPosition = true;
+                    mFixedPosition = mSelectIndex;
                     mFixedScrollX = getScrollX();
-                    mIsJustBegin = true;
                     break;
                 case ViewPager.SCROLL_STATE_SETTLING:     // 结束用户拖拉
 
                     break;
                 case ViewPager.SCROLL_STATE_IDLE:         // 结束所有位移
                     isDragTouch = false;
+                    mSelectIndex = (int) Math.rint(mSelectIndex);
+                    calculationRect(false);
                     break;
             }
         }
     };
-
-    // 得到权重值对应的滑动ScrollX
-    private int getScrollXByFloatWei(float mIndex) {
-        int position = (int) mIndex;
-        float positionOffset = mIndex - (int) mIndex;
-        int center;
-        int temTargetX;
-        int startScrollX;
-        int endScrollX;
-
-        if (position < 0) {
-            startScrollX = 0;
-        } else if (position >= getChildCount()) {
-            startScrollX = mMaxWid + getPaddingLeft() + getPaddingRight() - getWidth();
-        } else {
-            View startView = getChildAt(position);
-            center = startView.getLeft() / 2 + startView.getRight() / 2;
-            temTargetX = -getWidth() / 2 - getPaddingLeft() / 2 + getPaddingRight() / 2 + center;
-            startScrollX = Math.min(Math.max(temTargetX, 0), mMaxWid + getPaddingLeft() + getPaddingRight() - getWidth());
-        }
-
-        int targetIndex = (int) (position + positionOffset + 1);
-        if (targetIndex < 0) {
-            endScrollX = 0;
-        } else if (targetIndex >= getChildCount()) {
-            endScrollX = mMaxWid + getPaddingLeft() + getPaddingRight() - getWidth();
-        } else {
-            View targetView = getChildAt((targetIndex));
-            center = targetView.getLeft() / 2 + targetView.getRight() / 2;
-            endScrollX = -getWidth() / 2 - getPaddingLeft() / 2 + getPaddingRight() / 2 + center;
-            endScrollX = Math.min(Math.max(endScrollX, 0), mMaxWid + getPaddingLeft() + getPaddingRight() - getWidth());
-        }
-
-        return (int) ((endScrollX - startScrollX) * positionOffset + startScrollX);
-    }
-
-
-    // 刷新Adapter
-    private void refreshAdapter() {
-        removeAllViews();
-        for (TypeViewInfo info : mTypeToView.values()) {
-            info.currentUsedPosition = 0;
-        }
-        int count = mListAdapter != null ? mListAdapter.getCount() : 0;
-        for (int i = 0; i < count; i++) {
-            Integer type = mListAdapter.getItemViewType(i);
-            if (!mTypeToView.containsKey(type)) {
-                mTypeToView.put(type, new TypeViewInfo(type));
-            }
-            TypeViewInfo info = mTypeToView.get(type);
-            View canvasView = info.currentUsedPosition < info.holdViews.size() ? info.holdViews.get(info.currentUsedPosition) : null;
-            View current = mListAdapter.getView(i, canvasView, this);
-            if (current == null)
-                throw new RuntimeException("Adapter.getView(postion , convasView, viewParent) cannot be null ");
-            if (canvasView != current) {
-                if (canvasView == null) {
-                    info.holdViews.add(current);
-                } else {
-                    info.holdViews.remove(canvasView);
-                    info.holdViews.add(info.currentUsedPosition, current);
-                }
-            }
-            info.currentUsedPosition++;
-            addView(current);
-        }
-
-        mSelectIndex = Math.min(mSelectIndex, count - 1);
-        mSelectIndex = Math.max(0, mSelectIndex);
-        calculationRect(true);
-    }
-
-    // 载入Adapter
-    private void computeAdapter() {
-        mTypeToView.clear();
-        removeAllViews();
-        if (mListAdapter == null || mListAdapter.getCount() == 0) return;
-        int count = mListAdapter.getCount();
-        for (int i = 0; i < count; i++) {
-            Integer type = mListAdapter.getItemViewType(i);
-            if (!mTypeToView.containsKey(type)) {
-                mTypeToView.put(type, new TypeViewInfo(type));
-            }
-            TypeViewInfo info = mTypeToView.get(type);
-
-            View current = mListAdapter.getView(i, null, this);
-            if (current == null)
-                throw new RuntimeException("Adapter.getView(postion , convasView, viewParent) cannot be null ");
-            info.holdViews.add(current);
-            info.currentUsedPosition++;
-            addView(current);
-        }
-
-        mSelectIndex = Math.min(mSelectIndex, count - 1);
-        mSelectIndex = Math.max(0, mSelectIndex);
-        calculationRect(true);
-    }
 
 
     @Override
@@ -820,12 +744,35 @@ public class SlideSwitch extends ViewGroup {
     }
 
 
-    //------------------------------------------------------------------setting-----------------------------------------------------------//
+    // 载入Adapter
+    private void computeAdapter() {
+        mTypeToView.clear();
+        removeAllViews();
+        if (mListAdapter == null || mListAdapter.getCount() == 0) return;
+        int count = mListAdapter.getCount();
+        for (int i = 0; i < count; i++) {
+            Integer type = mListAdapter.getItemViewType(i);
+            if (!mTypeToView.containsKey(type)) {
+                mTypeToView.put(type, new TypeViewInfo(type));
+            }
+            TypeViewInfo info = mTypeToView.get(type);
 
+            View current = mListAdapter.getView(i, null, this);
+            if (current == null)
+                throw new RuntimeException("Adapter.getView(postion , convasView, viewParent) cannot be null ");
+            info.holdViews.add(current);
+            info.currentUsedPosition++;
+            addView(current);
+        }
 
-    public ViewPager.OnPageChangeListener getSupportOnPageChangeListener() {
-        return mViewPageChangeListener;
+        mSelectIndex = Math.min(mSelectIndex, count - 1);
+        mSelectIndex = Math.max(0, mSelectIndex);
+        calculationRect(true);
     }
+
+
+    private ListAdapter mListAdapter;
+
 
     public void setAdapter(ListAdapter adapter) {
         if (mListAdapter == adapter) return;
@@ -839,12 +786,65 @@ public class SlideSwitch extends ViewGroup {
         computeAdapter();
     }
 
+    private final DataSetObserver mDataSetObserver = new DataSetObserver() {
+        @Override
+        public void onChanged() {
+            refreshAdapter();
+        }
+
+    };
+
+
+    //刷新Adapter
+    private void refreshAdapter() {
+        removeAllViews();
+        for (TypeViewInfo info : mTypeToView.values()) {
+            info.currentUsedPosition = 0;
+        }
+        int count = mListAdapter != null ? mListAdapter.getCount() : 0;
+        for (int i = 0; i < count; i++) {
+            Integer type = mListAdapter.getItemViewType(i);
+            if (!mTypeToView.containsKey(type)) {
+                mTypeToView.put(type, new TypeViewInfo(type));
+            }
+            TypeViewInfo info = mTypeToView.get(type);
+            View canvasView = info.currentUsedPosition < info.holdViews.size() ? info.holdViews.get(info.currentUsedPosition) : null;
+            View current = mListAdapter.getView(i, canvasView, this);
+            if (current == null)
+                throw new RuntimeException("Adapter.getView(postion , convasView, viewParent) cannot be null ");
+            if (canvasView != current) {
+                if (canvasView == null) {
+                    info.holdViews.add(current);
+                } else {
+                    info.holdViews.remove(canvasView);
+                    info.holdViews.add(info.currentUsedPosition, current);
+                }
+            }
+            info.currentUsedPosition++;
+            addView(current);
+        }
+
+        mSelectIndex = Math.min(mSelectIndex, count - 1);
+        mSelectIndex = Math.max(0, mSelectIndex);
+        calculationRect(true);
+    }
+
+
+    //------------------------------------------------------------------setting-----------------------------------------------------------//
+
+
+    public ViewPager.OnPageChangeListener getSupportOnPageChangeListener() {
+        return mViewPageChangeListener;
+    }
+
+
     /**
      * 设置选择项
+     *
      * @param index
      */
-    public void setSlectIndex(int index){
-        if(mSelectIndex!=index){
+    public void setSlectIndex(int index) {
+        if (mSelectIndex != index) {
             mSelectIndex = index;
             mSelectIndex = Math.min(mSelectIndex, getChildCount() - 1);
             mSelectIndex = Math.max(0, mSelectIndex);
@@ -855,28 +855,14 @@ public class SlideSwitch extends ViewGroup {
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.mOnItemClickListener = listener;
+        setClickable(mOnItemClickListener != null);
     }
 
-    public void setOnButtonLineScrollListener(OnButtonLineScrollListener listener) {
-        this.mOnButtonLineScrollListener = listener;
+    public void setOnScrollListener(OnScrollListener listener) {
+        mOnScrollListener = listener;
     }
 
-    public interface OnItemClickListener {
-        void onItemClicked(int position);
-    }
-
-    public interface OnButtonLineScrollListener {
-        /**
-         * @param viewCount    当前View数量
-         * @param leftIndex    这边View 位置
-         * @param rightIndex   右边View 位置
-         * @param leftView     这边View
-         * @param rightView    右边View
-         * @param leftNearWei  中央位置接近 右边View 的尺度  0 表示远离； 1 表示重合
-         * @param rightNearWei 中央位置接近 右边View 的尺度  0 表示远离； 1 表示重合
-         */
-        void onButtonLineScroll(int viewCount, int leftIndex, int rightIndex, View leftView, View rightView, float leftNearWei, float rightNearWei);
-    }
 
 }
+
 

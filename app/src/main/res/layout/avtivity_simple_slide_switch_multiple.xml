@@ -24,55 +24,55 @@
             android:textColor="#ff656565"
             android:gravity="center" />
 
-        <TextView
-            android:background="#7700bbff"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="70dp"
-            android:textSize="14sp"
-            android:text="视频"
-            android:textColor="#ff656565"
-            android:gravity="center"/>
+        <!--<TextView-->
+            <!--android:background="#7700bbff"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:minWidth="70dp"-->
+            <!--android:textSize="14sp"-->
+            <!--android:text="视频"-->
+            <!--android:textColor="#ff656565"-->
+            <!--android:gravity="center"/>-->
 
-        <TextView
-            android:background="#6c8c00ff"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="70dp"
-            android:textSize="14sp"
-            android:text="教育"
-            android:textColor="#ff656565"
-            android:gravity="center"/>
+        <!--<TextView-->
+            <!--android:background="#6c8c00ff"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:minWidth="70dp"-->
+            <!--android:textSize="14sp"-->
+            <!--android:text="教育"-->
+            <!--android:textColor="#ff656565"-->
+            <!--android:gravity="center"/>-->
 
-        <TextView
-            android:background="#6c00ff51"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="70dp"
-            android:textSize="14sp"
-            android:text="娱乐"
-            android:textColor="#ff656565"
-            android:gravity="center" />
+        <!--<TextView-->
+            <!--android:background="#6c00ff51"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:minWidth="70dp"-->
+            <!--android:textSize="14sp"-->
+            <!--android:text="娱乐"-->
+            <!--android:textColor="#ff656565"-->
+            <!--android:gravity="center" />-->
 
-        <TextView
-            android:background="#6c8c00ff"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="70dp"
-            android:textSize="14sp"
-            android:text="可乐"
-            android:textColor="#ff656565"
-            android:gravity="center"/>
+        <!--<TextView-->
+            <!--android:background="#6c8c00ff"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:minWidth="70dp"-->
+            <!--android:textSize="14sp"-->
+            <!--android:text="可乐"-->
+            <!--android:textColor="#ff656565"-->
+            <!--android:gravity="center"/>-->
 
-        <TextView
-            android:background="#6cffbf00"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="70dp"
-            android:textSize="14sp"
-            android:text="流行"
-            android:textColor="#ff656565"
-            android:gravity="center"/>
+        <!--<TextView-->
+            <!--android:background="#6cffbf00"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:minWidth="70dp"-->
+            <!--android:textSize="14sp"-->
+            <!--android:text="流行"-->
+            <!--android:textColor="#ff656565"-->
+            <!--android:gravity="center"/>-->
 
         <TextView
             android:background="#6cf5757a"
@@ -94,44 +94,44 @@
             android:textColor="#ff656565"
             android:gravity="center"/>
 
-        <TextView
-            android:background="#6cd500ff"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="70dp"
-            android:textSize="14sp"
-            android:text="国足"
-            android:textColor="#ff656565"
-            android:gravity="center"/>
+        <!--<TextView-->
+            <!--android:background="#6cd500ff"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:minWidth="70dp"-->
+            <!--android:textSize="14sp"-->
+            <!--android:text="国足"-->
+            <!--android:textColor="#ff656565"-->
+            <!--android:gravity="center"/>-->
 
-        <TextView
-            android:background="#6cff22ed"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="70dp"
-            android:textSize="14sp"
-            android:text="美食"
-            android:textColor="#ff656565"
-            android:gravity="center"/>
-        <TextView
-            android:background="#6cff006f"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="70dp"
-            android:textSize="14sp"
-            android:text="笑话"
-            android:textColor="#ff656565"
-            android:gravity="center"  />
+        <!--<TextView-->
+            <!--android:background="#6cff22ed"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:minWidth="70dp"-->
+            <!--android:textSize="14sp"-->
+            <!--android:text="美食"-->
+            <!--android:textColor="#ff656565"-->
+            <!--android:gravity="center"/>-->
+        <!--<TextView-->
+            <!--android:background="#6cff006f"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:minWidth="70dp"-->
+            <!--android:textSize="14sp"-->
+            <!--android:text="笑话"-->
+            <!--android:textColor="#ff656565"-->
+            <!--android:gravity="center"  />-->
 
-        <TextView
-            android:background="#6c008cff"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="70dp"
-            android:textSize="14sp"
-            android:text="谐星"
-            android:textColor="#ff656565"
-            android:gravity="center"  />
+        <!--<TextView-->
+            <!--android:background="#6c008cff"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:minWidth="70dp"-->
+            <!--android:textSize="14sp"-->
+            <!--android:text="谐星"-->
+            <!--android:textColor="#ff656565"-->
+            <!--android:gravity="center"  />-->
 
 
 

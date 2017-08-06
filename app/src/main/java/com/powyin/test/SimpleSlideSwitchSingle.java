@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.powyin.slide.tool.ColorUtil;
+import com.powyin.slide.widget.OnItemClickListener;
 import com.powyin.slide.widget.SlideSwitch;
 
 /**
@@ -28,33 +29,33 @@ public class SimpleSlideSwitchSingle extends AppCompatActivity {
 
         viewPager.addOnPageChangeListener(slideSwitch.getSupportOnPageChangeListener());
 
-        slideSwitch.setOnItemClickListener(new SlideSwitch.OnItemClickListener() {
+        slideSwitch.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onItemClicked(int position) {
+            public void onItemClicked(int position, View view) {
                 viewPager.setCurrentItem(position);
             }
         });
 
-        slideSwitch.setOnButtonLineScrollListener(new SlideSwitch.OnButtonLineScrollListener() {
-            @Override
-            public void onButtonLineScroll(int viewCount, int leftIndex, int rightIndex, View leftView, View rightView, float leftNearWei, float rightNearWei) {
-                if (leftView != null) {
-                    if (leftView instanceof TextView) {
-                        TextView tem = (TextView) leftView;
-                        tem.setTextColor(ColorUtil.calculationColor(0xff656565, 0xff009dff, leftNearWei));
-                        tem.setTextSize(14 * (7 + leftNearWei) / 7);
-                    }
-
-                }
-                if (rightView != null) {
-                    if (rightView instanceof TextView) {
-                        TextView tem = (TextView) rightView;
-                        tem.setTextColor(ColorUtil.calculationColor(0xff656565, 0xff009dff, rightNearWei));
-                        tem.setTextSize(14 * (7 + rightNearWei) / 7);
-                    }
-                }
-            }
-        });
+//        slideSwitch.setOnButtonLineScrollListener(new SlideSwitch.OnButtonLineScrollListener() {
+//            @Override
+//            public void onButtonLineScroll(int viewCount, int leftIndex, int rightIndex, View leftView, View rightView, float leftNearWei, float rightNearWei) {
+//                if (leftView != null) {
+//                    if (leftView instanceof TextView) {
+//                        TextView tem = (TextView) leftView;
+//                        tem.setTextColor(ColorUtil.calculationColor(0xff656565, 0xff009dff, leftNearWei));
+//                        tem.setTextSize(14 * (7 + leftNearWei) / 7);
+//                    }
+//
+//                }
+//                if (rightView != null) {
+//                    if (rightView instanceof TextView) {
+//                        TextView tem = (TextView) rightView;
+//                        tem.setTextColor(ColorUtil.calculationColor(0xff656565, 0xff009dff, rightNearWei));
+//                        tem.setTextSize(14 * (7 + rightNearWei) / 7);
+//                    }
+//                }
+//            }
+//        });
 
 
     }

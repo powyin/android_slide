@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.graphics.Rect;
-import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -213,18 +212,14 @@ public class BannerSwitch extends ViewGroup {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-
-        super.onInterceptTouchEvent(ev);
-
         if (!mTouchScrollEnable || mIsUnableToDrag) {
             return false;
         }
-
         final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
 
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
-                mActivePointerId = ev.getPointerId(0);   // MotionEventCompat.getPointerId(ev, 0);
+                mActivePointerId = ev.getPointerId(0);
                 mIsUnableToDrag = false;
                 mLastMotionX = ev.getX();
                 mLastMotionY = ev.getY();
@@ -313,7 +308,6 @@ public class BannerSwitch extends ViewGroup {
             }
             case MotionEvent.ACTION_MOVE:
                 if (!mIsBeingDragged) {
-                    if (mActivePointerId == -1) return false;
                     int pointerIndex = ev.findPointerIndex(mActivePointerId);
                     if (pointerIndex < 0) return false;
 
@@ -406,29 +400,10 @@ public class BannerSwitch extends ViewGroup {
 
 
     @Override
-    public void setOnClickListener(@Nullable OnClickListener l) {
+    public void setOnClickListener( OnClickListener l) {
         throw new RuntimeException("not support onClickListener");
     }
 
-
-    private boolean performItemClick() {
-        if (mOnItemClickListener != null) {
-            for (int i = 0; i < getChildCount(); i++) {
-                Rect globeRect = new Rect();
-                View view = getChildAt(i);
-                globeRect.top = view.getTop();
-                globeRect.left = view.getLeft() + (int) view.getTranslationX();
-                globeRect.right = view.getRight() + (int) view.getTranslationX();
-                globeRect.bottom = view.getBottom();
-
-                if (globeRect.contains((int) mInitialMotionX, (int) mInitialMotionY)) {
-                    mOnItemClickListener.onItemClicked(i, view);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     // 检查子元素 是否存在滑动可能
     private boolean canScroll(View v, boolean checkV, int dx, int x, int y) {
@@ -695,9 +670,11 @@ public class BannerSwitch extends ViewGroup {
 
         index = index % getChildCount();
         index = (index + getChildCount()) % getChildCount();
-        int center = (int)getSelectCenter()[0];
+        int center = (int) getSelectCenter()[0];
 
-        if (index == center) { return; }
+        if (index == center) {
+            return;
+        }
 
         float step1 = center - index;
         float step2 = Math.max(mSwitchFixedItem, getChildCount()) + step1;
@@ -718,19 +695,27 @@ public class BannerSwitch extends ViewGroup {
 
     @Override
     public boolean performClick() {
-        performItemClick();
+        if (mOnItemClickListener != null) {
+            for (int i = 0; i < getChildCount(); i++) {
+                Rect globeRect = new Rect();
+                View view = getChildAt(i);
+                globeRect.top = view.getTop();
+                globeRect.left = view.getLeft() + (int) view.getTranslationX();
+                globeRect.right = view.getRight() + (int) view.getTranslationX();
+                globeRect.bottom = view.getBottom();
+
+                if (globeRect.contains((int) mInitialMotionX, (int) mInitialMotionY)) {
+                    mOnItemClickListener.onItemClicked(i, view);
+                    return true;
+                }
+            }
+        }
         return true;
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.mOnItemClickListener = listener;
-        setClickable(mOnItemClickListener!=null);
-//        super.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                performItemClick();
-//            }
-//        });
+        setClickable(mOnItemClickListener != null);
     }
 
     public void setEnableTouchScroll(boolean isEnable) {
@@ -738,7 +723,7 @@ public class BannerSwitch extends ViewGroup {
         setSelectPage(getSelectPage(), false);
     }
 
-    public void setOnButtonLineScrollListener(OnScrollListener listener) {
+    public void setOnScrollListener(OnScrollListener listener) {
         this.mOnScrollListener = listener;
     }
 
@@ -746,11 +731,6 @@ public class BannerSwitch extends ViewGroup {
         void onItemClicked(int position, View view);
     }
 
-    public interface OnScrollListener {
-        //   void onButtonLineScroll(int viewCount, int leftIndex, int rightIndex, View leftView, View rightView, float leftNearWei, float rightNearWei);
-        void onPageScrolled(int position, float positionOffset);
-
-    }
 
 }
 

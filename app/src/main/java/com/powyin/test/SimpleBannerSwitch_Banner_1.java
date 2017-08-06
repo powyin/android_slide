@@ -4,9 +4,10 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.powyin.slide.widget.BannerIndicatorRectView;
 import com.powyin.slide.widget.BannerSwitch;
-import com.powyin.slide.widget.BannerUpperCircleView;
-import com.powyin.slide.widget.BannerUpperRectView;
+import com.powyin.slide.widget.OnScrollListener;
+
 
 import java.util.Random;
 
@@ -17,7 +18,7 @@ public class SimpleBannerSwitch_Banner_1 extends Activity {
 
 
     BannerSwitch bannerSwitch;
-    BannerUpperCircleView bannerUpperRectView;
+    BannerIndicatorRectView bannerUpperRectView;
     ListViewAdapter adapter;
 
 
@@ -29,9 +30,9 @@ public class SimpleBannerSwitch_Banner_1 extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple_banner_switch_banner_1);
         bannerSwitch = (BannerSwitch) findViewById(R.id.my_banner);
-        bannerUpperRectView = (BannerUpperCircleView) findViewById(R.id.my_banner_upper_view);
+        bannerUpperRectView = (BannerIndicatorRectView) findViewById(R.id.my_banner_upper_view);
 
-        bannerSwitch.setOnButtonLineScrollListener(new BannerSwitch.OnScrollListener() {
+        bannerSwitch.setOnScrollListener(new OnScrollListener() {
             @Override
             public void onPageScrolled(int postion, float positionOffset) {
                 System.out.println("---------------------------->>>>>>1111111   "+postion + " --  "+positionOffset);

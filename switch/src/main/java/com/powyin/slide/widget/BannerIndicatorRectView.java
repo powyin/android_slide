@@ -9,14 +9,14 @@ import android.view.View;
 /**
  * Created by powyin on 2016/8/8.
  */
-public class BannerUpperRectView extends View {
+public class BannerIndicatorRectView extends View {
 
 
-    public BannerUpperRectView(Context context, AttributeSet attrs) {
+    public BannerIndicatorRectView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public BannerUpperRectView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public BannerIndicatorRectView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mRectUnSelect = new Paint();
         mRectUnSelect.setStyle(Paint.Style.FILL);
