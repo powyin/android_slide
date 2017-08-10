@@ -17,6 +17,7 @@
         android:layout_height="10dp" />
 
     <com.powyin.slide.widget.PowSwitch
+        android:id="@+id/pow"
         android:layout_width="50dp"
         android:layout_height="30dp"
         android:padding="5dp"

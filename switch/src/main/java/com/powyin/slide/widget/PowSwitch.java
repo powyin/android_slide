@@ -150,6 +150,15 @@ public class PowSwitch extends View {
         mSwitchBacOn.setBounds(bacRect);
     }
 
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+
+        if(changed){
+            ensureTarget();
+        }
+
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -190,9 +199,7 @@ public class PowSwitch extends View {
             }
             case MotionEvent.ACTION_MOVE:
                 if (!mIsBeingDragged) {                                                                              // just in case
-                    if (mActivePointerId == -1) {
-                        return false;
-                    }
+
                     int pointerIndex = ev.findPointerIndex(mActivePointerId);
                     if (pointerIndex < 0) {
                         return false;
@@ -224,13 +231,13 @@ public class PowSwitch extends View {
                     if (mIsOpen && mInitialMotionX < getWidth() / 2) {
                         mIsOpen = false;
                         if(mOnToggleListener!=null){
-                            mOnToggleListener.onToggle(mIsOpen);
+                            mOnToggleListener.onToggle(false);
                         }
                         ensureTarget();
                     } else if (!mIsOpen && mInitialMotionX > getWidth() / 2) {
                         mIsOpen = true;
                         if(mOnToggleListener!=null){
-                            mOnToggleListener.onToggle(mIsOpen);
+                            mOnToggleListener.onToggle(true);
                         }
                         ensureTarget();
                     }
@@ -253,24 +260,23 @@ public class PowSwitch extends View {
                 mActivePointerId = INVALID_POINTER;
                 mIsBeingDragged = false;
                 break;
+
             case MotionEventCompat.ACTION_POINTER_DOWN: {
                 final int index = MotionEventCompat.getActionIndex(ev);
                 mLastMotionX = ev.getX(index);
-                mActivePointerId = ev.getPointerId( index);
-
+                mActivePointerId = ev.getPointerId(index);
                 break;
             }
+
             case MotionEventCompat.ACTION_POINTER_UP:
-                onSecondaryPointerUp(ev);
-                mLastMotionX = ev.getX(
-                        ev.findPointerIndex(mActivePointerId));
+                final int actionPointerIndex = MotionEventCompat.getActionIndex(ev);
+                final int pointerId = ev.getPointerId(actionPointerIndex);
+                if (pointerId == mActivePointerId) {
+                    final int newPointerIndex = actionPointerIndex == 0 ? 1 : 0;
+                    mLastMotionX = ev.getX(newPointerIndex);
+                    mActivePointerId = ev.getPointerId(newPointerIndex);
+                }
                 break;
-        }
-
-        if (mIsBeingDragged) {
-            if (getParent() != null) {
-                getParent().requestDisallowInterceptTouchEvent(true);
-            }
         }
 
         return true;
@@ -307,7 +313,6 @@ public class PowSwitch extends View {
         }
 
         if(animationTarget == targetCurrent || targetMax == 0) return;
-
 
         if (valueAnimator != null) valueAnimator.cancel();
 

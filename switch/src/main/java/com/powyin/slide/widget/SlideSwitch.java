@@ -40,7 +40,6 @@ public class SlideSwitch extends ViewGroup {
     private Scroller mScroller;
     private VelocityTracker mVelocityTracker;
     private boolean mIsBeingDragged;
-    private boolean mIsUnableToDrag;
 
     float mInitialMotionX;
     float mInitialMotionY;
@@ -255,6 +254,7 @@ public class SlideSwitch extends ViewGroup {
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
             mInitialMotionX = ev.getX();
             mInitialMotionY = ev.getY();
+            mIsBeingDragged = false;
         }
         return super.dispatchTouchEvent(ev);
     }
@@ -263,20 +263,10 @@ public class SlideSwitch extends ViewGroup {
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
 
-        if (action != MotionEvent.ACTION_DOWN) {
-            if (mIsBeingDragged) {
-                return true;
-            }
-            if (mIsUnableToDrag) {
-                return false;
-            }
-        }
-
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
                 mLastMotionX = ev.getX();
                 mActivePointerId = ev.getPointerId(0);
-                mIsUnableToDrag = false;
 
                 if (!mScroller.isFinished() && mScroller.computeScrollOffset()) {
                     mScroller.abortAnimation();
@@ -343,8 +333,6 @@ public class SlideSwitch extends ViewGroup {
             }
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                mIsBeingDragged = false;
-                mIsUnableToDrag = false;
                 mActivePointerId = INVALID_POINTER;
                 if (mVelocityTracker != null) {
                     mVelocityTracker.recycle();
@@ -426,8 +414,8 @@ public class SlideSwitch extends ViewGroup {
                     startInternalFly();
                     ViewCompat.postInvalidateOnAnimation(this);
                 }
-                mIsBeingDragged = false;
-                mIsUnableToDrag = false;
+
+
                 mActivePointerId = INVALID_POINTER;
 
                 if (mVelocityTracker != null) {
@@ -449,6 +437,9 @@ public class SlideSwitch extends ViewGroup {
 
     @Override
     public boolean performClick() {
+
+        if(mIsBeingDragged) return true;
+
         for (int i = 0; i < getChildCount(); i++) {
             Rect globeRect = new Rect();
             View view = getChildAt(i);
@@ -658,18 +649,22 @@ public class SlideSwitch extends ViewGroup {
             int scrollRight = targetView == null ? scrollLeft : (targetView.getLeft() + targetView.getRight()) / 2;
             int targetScrollX = (int) (scrollLeft + (targetSelectIndex - locLeft) * (scrollRight - scrollLeft));
             targetScrollX -= getWidth() / 2;
-            targetScrollX = targetScrollX > 0 ? targetScrollX : 0;
+
 
             selectIndexOffset = targetSelectIndex - mFixedSelect;
             selectIndexOffset = selectIndexOffset < 0 ? -selectIndexOffset : selectIndexOffset;
 
             targetScrollX = (int) (mFixedScrollX + (targetScrollX - mFixedScrollX) * selectIndexOffset);
-            mSelectIndex = mFixedPosition + (targetSelectIndex - mFixedPosition) * selectIndexOffset;
+            targetScrollX = targetScrollX > 0 ? targetScrollX : 0;
+            int maxScrollX = mMaxWid - getWidth();
+            maxScrollX = maxScrollX > 0 ? maxScrollX : 0;
+            targetScrollX = targetScrollX < maxScrollX ? targetScrollX : maxScrollX;
 
             if (targetScrollX != getScrollX()) {
                 scrollTo(targetScrollX, 0);
             }
 
+            mSelectIndex = mFixedPosition + (targetSelectIndex - mFixedPosition) * selectIndexOffset;
             calculationRect(false);
         }
 
