@@ -9,7 +9,7 @@
 Add Gradle dependency:
 ```gradle
 dependencies {
-   compile 'com.github.powyin:switch:3.0.0'
+   compile 'com.github.powyin:switch:3.0.1'
 }
 ```
 
