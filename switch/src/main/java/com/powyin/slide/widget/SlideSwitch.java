@@ -192,7 +192,7 @@ public class SlideSwitch extends ViewGroup {
             }
         }
     }
-
+    int maxScrollX;
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int childTop = 0;
@@ -223,7 +223,8 @@ public class SlideSwitch extends ViewGroup {
             }
             mMaxWid = Math.max(getWidth(), (int) (pace * (count)));
         }
-
+        maxScrollX = mMaxWid - getWidth();
+        maxScrollX = maxScrollX > 0 ? maxScrollX : 0;
         calculationRect(true);
     }
 
@@ -621,50 +622,46 @@ public class SlideSwitch extends ViewGroup {
         boolean isDragTouch = false;                                                                          //是否手指触摸滚动
         boolean needGetPosition;
         float mFixedSelect;
-        float mFixedPosition = 0;                                                                             //辅助记录手指触摸点信息；
+//        float mFixedPosition = 0;                                                                             //辅助记录手指触摸点信息；
         int mFixedScrollX = 0;                                                                                //辅助记录手指触摸点信息；
 
         @Override
         public void onPageScrolled(int position, float selectIndexOffset, int positionOffsetPixels) {
             if (!isDragTouch) return;
-
             if (needGetPosition) {
-                mFixedSelect = position + selectIndexOffset;
+                mFixedSelect = (int)Math.rint(position + selectIndexOffset);
                 needGetPosition = false;
             }
 
-            if (mScroller != null) mScroller.abortAnimation();
-            if (valueAnimator != null) valueAnimator.cancel();
-
-
             float targetSelectIndex = position + selectIndexOffset;
-            targetSelectIndex = Math.min(targetSelectIndex, getChildCount() - 1);
             targetSelectIndex = targetSelectIndex < getChildCount() - 1 ? targetSelectIndex : getChildCount() - 1;
 
             int locLeft = (int) targetSelectIndex;
             int locRight = locLeft + 1;
             View originView = getChildAt(locLeft);
-            View targetView = locRight < getChildCount() ? getChildAt(locRight) : null;
+            View targetView = locRight < getChildCount() ? getChildAt(locRight) : originView;
             int scrollLeft = (originView.getLeft() + originView.getRight()) / 2;
-            int scrollRight = targetView == null ? scrollLeft : (targetView.getLeft() + targetView.getRight()) / 2;
+            int scrollRight =  (targetView.getLeft() + targetView.getRight()) / 2;
             int targetScrollX = (int) (scrollLeft + (targetSelectIndex - locLeft) * (scrollRight - scrollLeft));
             targetScrollX -= getWidth() / 2;
 
+            targetScrollX = targetScrollX > 0 ? targetScrollX : 0;
+            targetScrollX = targetScrollX < maxScrollX ? targetScrollX : maxScrollX;
 
             selectIndexOffset = targetSelectIndex - mFixedSelect;
             selectIndexOffset = selectIndexOffset < 0 ? -selectIndexOffset : selectIndexOffset;
 
             targetScrollX = (int) (mFixedScrollX + (targetScrollX - mFixedScrollX) * selectIndexOffset);
+
             targetScrollX = targetScrollX > 0 ? targetScrollX : 0;
-            int maxScrollX = mMaxWid - getWidth();
-            maxScrollX = maxScrollX > 0 ? maxScrollX : 0;
             targetScrollX = targetScrollX < maxScrollX ? targetScrollX : maxScrollX;
 
             if (targetScrollX != getScrollX()) {
                 scrollTo(targetScrollX, 0);
             }
 
-            mSelectIndex = mFixedPosition + (targetSelectIndex - mFixedPosition) * selectIndexOffset;
+            mSelectIndex = mFixedSelect + (targetSelectIndex - mFixedSelect) * selectIndexOffset;
+
             calculationRect(false);
         }
 
@@ -678,9 +675,10 @@ public class SlideSwitch extends ViewGroup {
         public void onPageScrollStateChanged(int state) {
             switch (state) {
                 case ViewPager.SCROLL_STATE_DRAGGING:     // 开始用户拖拉
+                    if (mScroller != null) mScroller.abortAnimation();
+                    if (valueAnimator != null) valueAnimator.cancel();
                     isDragTouch = true;
                     needGetPosition = true;
-                    mFixedPosition = mSelectIndex;
                     mFixedScrollX = getScrollX();
                     break;
                 case ViewPager.SCROLL_STATE_SETTLING:     // 结束用户拖拉
