@@ -204,6 +204,8 @@ public class BannerSwitch extends ViewGroup {
                 mInitialMotionY = ev.getY();
                 mIsUnableToDrag = false;
                 mIsBeingDragged = false;
+                mActivePointerId = -1;
+
                 break;
         }
 
@@ -215,6 +217,7 @@ public class BannerSwitch extends ViewGroup {
         if (!mTouchScrollEnable || mIsUnableToDrag) {
             return false;
         }
+
         final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
 
         switch (action) {
@@ -247,7 +250,7 @@ public class BannerSwitch extends ViewGroup {
                     return false;
                 }
 
-                if (xDiff > mTouchSlop && xDiff * 0.5f > yDiff) {
+                if ((xDiff > mTouchSlop) && (xDiff * 0.5f > yDiff) && !mIsUnableToDrag) {
                     mIsBeingDragged = true;
                     getParent().requestDisallowInterceptTouchEvent(true);
                     setScrollingCacheEnabled();
@@ -258,6 +261,7 @@ public class BannerSwitch extends ViewGroup {
                 if (mIsBeingDragged) {
                     offsetScrollX(x);
                 }
+
                 break;
             }
 
@@ -281,10 +285,7 @@ public class BannerSwitch extends ViewGroup {
                 break;
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
-                mIsBeingDragged = false;
-                mIsUnableToDrag = false;
-                mActivePointerId = -1;
-                return false;
+                break;
         }
         return mIsBeingDragged;
     }
@@ -292,9 +293,9 @@ public class BannerSwitch extends ViewGroup {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        super.onTouchEvent(ev);
+        boolean ret = super.onTouchEvent(ev);
         if (!mTouchScrollEnable) {
-            return false;
+            return ret;
         }
 
         final int action = ev.getAction();
@@ -309,21 +310,16 @@ public class BannerSwitch extends ViewGroup {
             case MotionEvent.ACTION_MOVE:
                 if (!mIsBeingDragged) {
                     int pointerIndex = ev.findPointerIndex(mActivePointerId);
-                    if (pointerIndex < 0) return false;
-
                     float x = ev.getX(pointerIndex);
                     float y = ev.getY(pointerIndex);
-
                     final float xDiff = Math.abs(x - mLastMotionX);
-
-
                     if (xDiff != 0 &&
                             canScroll(this, false, (int) xDiff, (int) x, (int) y)) {
                         mIsUnableToDrag = true;
                         return false;
                     }
 
-                    if (xDiff > mTouchSlop) {
+                    if (xDiff > mTouchSlop && !mIsUnableToDrag) {
                         mIsBeingDragged = true;
                         mLastMotionX = x;
                         getParent().requestDisallowInterceptTouchEvent(true);
@@ -357,8 +353,6 @@ public class BannerSwitch extends ViewGroup {
                     startInternalTouchFly();
                     ViewCompat.postInvalidateOnAnimation(this);
                 }
-                mActivePointerId = -1;
-                mIsBeingDragged = false;
                 break;
 
         }
@@ -400,7 +394,7 @@ public class BannerSwitch extends ViewGroup {
 
 
     @Override
-    public void setOnClickListener( OnClickListener l) {
+    public void setOnClickListener(OnClickListener l) {
         throw new RuntimeException("not support onClickListener");
     }
 

@@ -192,7 +192,9 @@ public class SlideSwitch extends ViewGroup {
             }
         }
     }
+
     int maxScrollX;
+
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int childTop = 0;
@@ -383,7 +385,7 @@ public class SlideSwitch extends ViewGroup {
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                if (!mIsBeingDragged) {                                                                              // just in case
+                if (!mIsBeingDragged) {
                     int pointerIndex = ev.findPointerIndex(mActivePointerId);
                     final float x = ev.getX(pointerIndex);
                     final float xDiff = Math.abs(x - mLastMotionX);
@@ -438,8 +440,7 @@ public class SlideSwitch extends ViewGroup {
 
     @Override
     public boolean performClick() {
-
-        if(mIsBeingDragged) return true;
+        if (mIsBeingDragged) return true;
 
         for (int i = 0; i < getChildCount(); i++) {
             Rect globeRect = new Rect();
@@ -622,14 +623,14 @@ public class SlideSwitch extends ViewGroup {
         boolean isDragTouch = false;                                                                          //是否手指触摸滚动
         boolean needGetPosition;
         float mFixedSelect;
-//        float mFixedPosition = 0;                                                                             //辅助记录手指触摸点信息；
+        //        float mFixedPosition = 0;                                                                             //辅助记录手指触摸点信息；
         int mFixedScrollX = 0;                                                                                //辅助记录手指触摸点信息；
 
         @Override
         public void onPageScrolled(int position, float selectIndexOffset, int positionOffsetPixels) {
             if (!isDragTouch) return;
             if (needGetPosition) {
-                mFixedSelect = (int)Math.rint(position + selectIndexOffset);
+                mFixedSelect = (int) Math.rint(position + selectIndexOffset);
                 needGetPosition = false;
             }
 
@@ -641,7 +642,7 @@ public class SlideSwitch extends ViewGroup {
             View originView = getChildAt(locLeft);
             View targetView = locRight < getChildCount() ? getChildAt(locRight) : originView;
             int scrollLeft = (originView.getLeft() + originView.getRight()) / 2;
-            int scrollRight =  (targetView.getLeft() + targetView.getRight()) / 2;
+            int scrollRight = (targetView.getLeft() + targetView.getRight()) / 2;
             int targetScrollX = (int) (scrollLeft + (targetSelectIndex - locLeft) * (scrollRight - scrollLeft));
             targetScrollX -= getWidth() / 2;
 
