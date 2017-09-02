@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.util.AttributeSet;
@@ -161,6 +162,11 @@ public class PowSwitch extends View {
     }
 
     @Override
+    public void setOnClickListener(@Nullable OnClickListener l) {
+        throw new RuntimeException("not support");
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
@@ -291,16 +297,6 @@ public class PowSwitch extends View {
         invalidate();
     }
 
-    // 多指介入
-    private void onSecondaryPointerUp(MotionEvent ev) {
-        final int pointerIndex = MotionEventCompat.getActionIndex(ev);
-        final int pointerId = ev.getPointerId(pointerIndex);
-        if (pointerId == mActivePointerId) {
-            final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-            mLastMotionX = ev.getX(newPointerIndex);
-            mActivePointerId = ev.getPointerId(newPointerIndex);
-        }
-    }
 
 
     private void ensureTarget() {

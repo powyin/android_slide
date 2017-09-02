@@ -126,7 +126,7 @@
 
         </com.powyin.slide.widget.BannerSwitch>
 
-        <com.powyin.slide.widget.BannerUpperRectView
+        <com.powyin.slide.widget.BannerIndicatorRectView
             android:id="@+id/my_banner_upper_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

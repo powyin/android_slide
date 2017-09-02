@@ -25,7 +25,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile project(':switch')
 //    or
-//    compile 'com.github.powyin:switch:3.1.0'
+//    compile 'com.github.powyin:switch:3.1.1'
 
 
 }
