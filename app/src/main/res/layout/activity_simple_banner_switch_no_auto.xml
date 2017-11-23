@@ -8,7 +8,9 @@
     <com.powyin.slide.widget.BannerSwitch
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        app:pow_switch_touch_scroll="false"
+        app:pow_switch_touch_scroll="true"
+        app:pow_switch_fixed_edge="true"
+        app:pow_switch_fixed_item="10"
         android:id="@+id/my_banner">
 
         <FrameLayout
@@ -123,7 +125,7 @@
         android:layout_height="match_parent"
         android:layout_marginTop="100dp"
         android:gravity="center"
-        android:text="无自动播放 无限循环\n支持ListAdapter\napp:pow_switch_fixed_item= 3\n    app:pow_switch_auto_ennable=false"
+        android:text="无自动播放 无限循环\n支持ListAdapter\n     app:pow_switch_touch_scroll= false\n app:pow_switch_fixed_edge=true"
         />
 
 </LinearLayout>
