@@ -462,7 +462,7 @@ public class BannerSwitch extends ViewGroup {
     // 重写是否支持滑动
     @Override
     public boolean canScrollHorizontally(int direction) {
-        super.canScrollHorizontally(direction)
+        super.canScrollHorizontally(direction);
         if (!mSwitchEdge) {
             return true;
         }

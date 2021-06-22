@@ -1,19 +1,16 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
 
-version = "3.1.2"
 
 android {
 
     resourcePrefix "powyin_switch" //随意填写
 
-    compileSdkVersion 24
-    buildToolsVersion "26.0.2"
+    compileSdkVersion 26
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 24
+        targetSdkVersion 26
         versionCode 312
         versionName "312"
     }
@@ -28,79 +25,6 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:support-v4:24.0.0'
-}
-
-def siteUrl = 'https://github.com/powyin/slide'                  // 项目的主页
-def gitUrl = 'git@github.com:powyin/slide.git'                   // Git仓库的url
-group = 'com.github.powyin'                                      // Maven Group ID for the artifact，一般填你唯一的包名
-
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'aar'
-                // Add your description here
-                name 'android  slide switch'     //项目的描述 你可以多写一点
-                url siteUrl
-                // Set your license
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id 'powyin'        //填写的一些基本信息
-                        name 'yinhaoxiang'
-                        email 'haoxiangyin@gmail.com'
-                    }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-                }
-            }
-        }
-    }
-}
-
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    options.encoding = "UTF-8"
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-    configurations = ['archives']
-    pkg {
-        repo = "maven"
-        name = "slide-switch"    //发布到JCenter上的项目名字
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = ["Apache-2.0"]
-        publish = true
-    }
+    implementation 'com.android.support:design:27.1.1'
 }
 
