@@ -22,7 +22,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:design:28.0.0'
     implementation project(':switch')
     // or
     // implementation('com.github.powyin:switch:3.1.5') { transitive = false }
