@@ -6,9 +6,7 @@ plugins {
 
 
 android {
-
     resourcePrefix "powyin_switch" //随意填写
-
     compileSdkVersion 30
     defaultConfig {
         minSdkVersion 24

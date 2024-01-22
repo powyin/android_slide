@@ -4,10 +4,10 @@ plugins {
 }
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.powyin.slide"
-        minSdkVersion 15
+        minSdkVersion 24
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
