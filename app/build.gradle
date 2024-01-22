@@ -1,4 +1,7 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
 
 android {
     compileSdkVersion 26
@@ -21,11 +24,9 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:design:27.1.1'
-    compile project(':switch')
-//    or
-//    compile 'com.github.powyin:switch:3.1.1'
-
-
+    implementation project(':switch')
+    // or
+    // implementation('com.github.powyin:switch:3.1.5') { transitive = false }
 }
