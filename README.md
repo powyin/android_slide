@@ -6,7 +6,7 @@
 Add Gradle dependency:
 ```gradle
 dependencies {
-   compile 'com.github.powyin:switch:3.1.1'
+       implementation('com.github.powyin:switch:3.1.5') { transitive = false }
 }
 ```
 
