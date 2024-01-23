@@ -33,7 +33,7 @@ public class SimpleSlideSwitchMultiple extends AppCompatActivity {
 
         slideSwitch.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onItemClicked(int position,View view) {
+            public void onItemClicked(View view, int position, View... unselect) {
                 viewPager.setCurrentItem(position);
             }
 

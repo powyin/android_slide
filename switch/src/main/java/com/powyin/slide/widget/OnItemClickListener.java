@@ -7,6 +7,5 @@ import android.view.View;
  */
 
 public interface OnItemClickListener {
-    void onItemClicked(int position, View view);
-
+    void onItemClicked(View select, int position, View... unSelect);
 }

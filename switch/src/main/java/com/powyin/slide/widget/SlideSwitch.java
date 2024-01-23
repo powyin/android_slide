@@ -452,7 +452,14 @@ public class SlideSwitch extends ViewGroup {
                 if (mSelectIndex != i) {
                     preformItemSelectAnimationClick(i);
                     if (mOnItemClickListener != null) {
-                        mOnItemClickListener.onItemClicked(i, view);
+                        List<View> unSelectList = new ArrayList<>();
+                        for (int j = 0; j < getChildCount(); j++) {
+                            View childAt = getChildAt(j);
+                            if (view != childAt) {
+                                unSelectList.add(childAt);
+                            }
+                        }
+                        mOnItemClickListener.onItemClicked(view, i, unSelectList.toArray(new View[0]));
                     }
                 }
                 break;
@@ -824,18 +831,16 @@ public class SlideSwitch extends ViewGroup {
 
     //------------------------------------------------------------------setting-----------------------------------------------------------//
 
-
     public ViewPager.OnPageChangeListener getSupportOnPageChangeListener() {
         return mViewPageChangeListener;
     }
-
 
     /**
      * 设置选择项
      *
      * @param index
      */
-    public void setSlectIndex(int index) {
+    public void setSelectIndex(int index) {
         if (mSelectIndex != index) {
             mSelectIndex = index;
             mSelectIndex = Math.min(mSelectIndex, getChildCount() - 1);
@@ -844,7 +849,6 @@ public class SlideSwitch extends ViewGroup {
         }
     }
 
-
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.mOnItemClickListener = listener;
     }
@@ -852,7 +856,6 @@ public class SlideSwitch extends ViewGroup {
     public void setOnScrollListener(OnScrollListener listener) {
         mOnScrollListener = listener;
     }
-
 
 }
 
