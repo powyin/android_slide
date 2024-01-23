@@ -67,6 +67,7 @@ public class SlideSwitch extends ViewGroup {
 
     Map<Integer, TypeViewInfo> mTypeToView = new HashMap<>();
 
+    int maxScrollX;
 
     private class TypeViewInfo {
         Integer mType;
@@ -111,6 +112,8 @@ public class SlideSwitch extends ViewGroup {
         ViewConfiguration configuration = ViewConfiguration.get(context);
         mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
         mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
+
+        setClickable(true);
     }
 
     @Override
@@ -193,8 +196,6 @@ public class SlideSwitch extends ViewGroup {
         }
     }
 
-    int maxScrollX;
-
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int childTop = 0;
@@ -250,10 +251,8 @@ public class SlideSwitch extends ViewGroup {
         super.dispatchDraw(canvas);
     }
 
-
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
             mInitialMotionX = ev.getX();
             mInitialMotionY = ev.getY();
@@ -347,7 +346,6 @@ public class SlideSwitch extends ViewGroup {
         if (mVelocityTracker != null) {
             mVelocityTracker.addMovement(ev);
         }
-
 
         return mIsBeingDragged;
     }
@@ -629,6 +627,7 @@ public class SlideSwitch extends ViewGroup {
         @Override
         public void onPageScrolled(int position, float selectIndexOffset, int positionOffsetPixels) {
             if (!isDragTouch) return;
+
             if (needGetPosition) {
                 mFixedSelect = (int) Math.rint(position + selectIndexOffset);
                 needGetPosition = false;
@@ -662,7 +661,6 @@ public class SlideSwitch extends ViewGroup {
             }
 
             mSelectIndex = mFixedSelect + (targetSelectIndex - mFixedSelect) * selectIndexOffset;
-
             calculationRect(false);
         }
 
@@ -849,7 +847,6 @@ public class SlideSwitch extends ViewGroup {
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.mOnItemClickListener = listener;
-        setClickable(mOnItemClickListener != null);
     }
 
     public void setOnScrollListener(OnScrollListener listener) {
