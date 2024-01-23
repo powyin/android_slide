@@ -6,7 +6,7 @@
 Add Gradle dependency:
 ```gradle
 dependencies {
-       implementation('com.github.powyin:android_slide:3.3.0') { transitive = false }
+       implementation('com.github.powyin:android_slide:3.3.1') { transitive = false }
 }
 ```
 
