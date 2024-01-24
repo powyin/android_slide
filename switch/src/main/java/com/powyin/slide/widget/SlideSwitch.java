@@ -606,7 +606,16 @@ public class SlideSwitch extends ViewGroup {
             if (oldLeft != mSelectDrawableRect.left || oldRight != mSelectDrawableRect.right) {
                 if (mOnScrollListener != null) {
                     int center = (int) Math.rint(mSelectIndex);
-                    mOnScrollListener.onPageScrolled(center, mSelectIndex - center);
+                    View select = null;
+                    List<View> unSelect = new ArrayList<>();
+                    for (int i = 0; i < getChildCount(); i++) {
+                        if (i == center) {
+                            select = getChildAt(i);
+                        } else {
+                            unSelect.add(getChildAt(i));
+                        }
+                    }
+                    mOnScrollListener.onPageScrolled(center, mSelectIndex - center, select, unSelect.toArray(new View[0]));
                 }
                 ViewCompat.postInvalidateOnAnimation(SlideSwitch.this);
             }

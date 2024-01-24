@@ -34,7 +34,7 @@ public class SimpleBannerSwitch_Banner_1 extends Activity {
 
         bannerSwitch.setOnScrollListener(new OnScrollListener() {
             @Override
-            public void onPageScrolled(int postion, float positionOffset) {
+            public void onPageScrolled(int postion, float positionOffset, View select, View... unSelect) {
                 System.out.println("---------------------------->>>>>>1111111   "+postion + " --  "+positionOffset);
                 bannerUpperRectView.onButtonLineScroll(bannerSwitch.getChildCount(),postion,positionOffset);
             }

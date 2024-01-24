@@ -70,7 +70,7 @@ public class BannerSwitch extends ViewGroup {
 
     };
 
-    private class TypeViewInfo {
+    private static class TypeViewInfo {
         Integer mType;
         List<View> holdViews = new ArrayList<>();
         int currentUsedPosition;
@@ -88,24 +88,18 @@ public class BannerSwitch extends ViewGroup {
         @Override
         public void run() {
             // ------------------------------------------------ 控制容量不够 与 展示边界情况---------------------------------------------------//
-
             if (isCancel || mSelectIndexMin != Float.MIN_VALUE || mSelectIndexMax != Float.MAX_VALUE) {
                 return;
             }
-
             // ------------------------------------------------------------------------------------------------------------------------------//
-
-
             if (getVisibility() == VISIBLE && !delay) {
                 startInternalPageFly(-1, true);
             }
-
             if (delay) {
                 postDelayed(this, mSwitchPagePeriod / 2);
             } else {
                 postDelayed(this, mSwitchPagePeriod);
             }
-
             delay = false;
         }
     }
@@ -205,7 +199,6 @@ public class BannerSwitch extends ViewGroup {
             int childHeight = child.getMeasuredHeight();
             child.layout(childLeft, childTop, childLeft + pace, childHeight + childTop);
         }
-
         ensureTranslationOrder();
     }
 
@@ -388,9 +381,7 @@ public class BannerSwitch extends ViewGroup {
                     ViewCompat.postInvalidateOnAnimation(this);
                 }
                 break;
-
         }
-
         return true;
     }
 
@@ -399,7 +390,6 @@ public class BannerSwitch extends ViewGroup {
         if (autoProgress != null) {
             autoProgress.isCancel = true;
         }
-
         if (mSelectIndexMin == Float.MIN_VALUE && mSelectIndexMax == Float.MAX_VALUE) {
             autoProgress = new AnimationRun();
             postDelayed(autoProgress, (int) (mSwitchPagePeriod / 1.5f));
@@ -491,11 +481,11 @@ public class BannerSwitch extends ViewGroup {
 
     // View开启Draw缓存
     private void setScrollingCacheEnabled(boolean enabled) {
-        final int size = getChildCount();
-        for (int i = 0; i < size; ++i) {
-            final View child = getChildAt(i);
-            child.setDrawingCacheEnabled(enabled);
-        }
+//        final int size = getChildCount();
+//        for (int i = 0; i < size; ++i) {
+//            final View child = getChildAt(i);
+//            child.setDrawingCacheEnabled(enabled);
+//        }
     }
 
     // 抬手后状态恢复动画
@@ -580,7 +570,16 @@ public class BannerSwitch extends ViewGroup {
 
         if (mOnScrollListener != null) {
             float[] target = getSelectCenter();
-            mOnScrollListener.onPageScrolled((int) target[0], target[1]);
+            View select = null;
+            List<View> unSelect = new ArrayList<>();
+            for (int i = 0; i < getChildCount(); i++) {
+                if (i == (int) target[0]) {
+                    select = getChildAt(i);
+                } else {
+                    unSelect.add(getChildAt(i));
+                }
+            }
+            mOnScrollListener.onPageScrolled((int) target[0], target[1], select, unSelect.toArray(new View[0]));
         }
 
         int scrollWidth = (int) (Math.max(count, mSwitchFixedItem) * pace);
@@ -589,7 +588,7 @@ public class BannerSwitch extends ViewGroup {
         if (mSelectIndexMin != Float.MIN_VALUE || mSelectIndexMax != Float.MAX_VALUE) {
             for (int i = 0; i < count; i++) {
                 int x = (int) ((i + mSelectIndex) * pace);
-                    getChildAt(i).setTranslationX(x);
+                getChildAt(i).setTranslationX(x);
             }
         } else {
             for (int i = 0; i < count; i++) {
@@ -720,7 +719,6 @@ public class BannerSwitch extends ViewGroup {
         index = index % getChildCount();
         index = (index + getChildCount()) % getChildCount();
         int center = (int) getSelectCenter()[0];
-
         if (index == center) {
             return;
         }
@@ -733,9 +731,8 @@ public class BannerSwitch extends ViewGroup {
         step = Math.abs(step) < Math.abs(step3) ? step : step3;
 
         float target = (int) Math.rint(mSelectIndex + step);
-
-        target = target > mSelectIndexMin ? target : mSelectIndexMin;
-        target = target < mSelectIndexMax ? target : mSelectIndexMax;
+        target = Math.max(target, mSelectIndexMin);
+        target = Math.min(target, mSelectIndexMax);
 
         startInternalPageFly(target - mSelectIndex, animation);
 

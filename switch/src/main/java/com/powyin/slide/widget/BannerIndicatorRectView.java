@@ -37,7 +37,6 @@ public class BannerIndicatorRectView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         ensureConfig();
-
     }
 
     // 内外圆画笔； 用于定位当前页面的index；
@@ -89,7 +88,7 @@ public class BannerIndicatorRectView extends View {
         }
 
         float endPoint = mIndex + offset;
-;
+        ;
 
         if (endPoint < 0) {
             split[1] = (int) ((1 + endPoint) * mDiverContent) + split[0];
@@ -106,11 +105,11 @@ public class BannerIndicatorRectView extends View {
     }
 
 
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
+        ensureConfig();
+        ensureProgerss();
 
         for (int i = 0; i < mViewCount; i++) {
             int index0 = split[4 * i];
@@ -131,24 +130,14 @@ public class BannerIndicatorRectView extends View {
             }
         }
 
-
     }
 
     //---------------------------------setting-------------------------------------//
-
-
     public void onButtonLineScroll(int viewCount, int centerIndex, float off) {
-
-        if (this.mViewCount != viewCount) {
-            this.mViewCount = viewCount;
-            this.mViewCount = viewCount;
-            ensureConfig();
-        }
-
+        //
+        this.mViewCount = viewCount;
         mIndex = centerIndex;
         offset = off;
-
-        ensureProgerss();
         invalidate();
     }
 

@@ -41,7 +41,7 @@ public class SimpleSlideSwitchMultiple extends AppCompatActivity {
 
         slideSwitch.setOnScrollListener(new OnScrollListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset) {
+            public void onPageScrolled(int position, float positionOffset, View select, View... unSelect) {
 //                if (leftView != null) {
 //                    if (leftView instanceof TextView) {
 //                        TextView tem = (TextView) leftView;

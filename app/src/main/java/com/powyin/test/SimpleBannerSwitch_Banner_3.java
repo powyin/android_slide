@@ -45,7 +45,7 @@ public class SimpleBannerSwitch_Banner_3 extends Activity {
 
         bannerSwitch.setOnScrollListener(new OnScrollListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset) {
+            public void onPageScrolled(int position, float positionOffset, View select, View... unSelect) {
                 System.out.println("                    onPageScrolled " + position + "      " +bannerSwitch.getSelectPage());
 
             }
