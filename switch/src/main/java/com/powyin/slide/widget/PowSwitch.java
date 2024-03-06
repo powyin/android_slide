@@ -6,9 +6,11 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Nullable;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.ViewConfigurationCompat;
+
+import androidx.annotation.Nullable;
+import androidx.core.view.MotionEventCompat;
+import androidx.core.view.ViewConfigurationCompat;
+
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,15 +19,14 @@ import android.view.ViewParent;
 
 import com.powyin.slide.R;
 
-import java.lang.reflect.Method;
-
 /**
  * Created by powyin on 2016/8/4.
  */
 public class PowSwitch extends View {
 
+    private boolean mTouchEnable = true;
     private boolean mIsBeingDragged;
-    private int mTouchSlop;
+    private int mTouchStop;
     private float mLastMotionX;
     private float mInitialMotionX;
     private float mInitialMotionY;
@@ -76,9 +77,8 @@ public class PowSwitch extends View {
 
         a.recycle();
 
-
-        mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(ViewConfiguration.get(context)) / 2;
-
+        ViewConfiguration configuration = ViewConfiguration.get(context);
+        mTouchStop = configuration.getScaledPagingTouchSlop();
     }
 
     public PowSwitch(Context context, AttributeSet attrs) {
@@ -154,11 +154,9 @@ public class PowSwitch extends View {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-
         if (changed) {
             ensureTarget();
         }
-
     }
 
     @Override
@@ -195,6 +193,9 @@ public class PowSwitch extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        if (!mTouchEnable) {
+            return false;
+        }
         final int action = ev.getAction();
         switch (action & MotionEventCompat.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN: {
@@ -212,10 +213,10 @@ public class PowSwitch extends View {
                     }
                     final float x = ev.getX(pointerIndex);
                     final float xDiff = Math.abs(x - mLastMotionX);
-                    if (xDiff > mTouchSlop) {
+                    if (xDiff > mTouchStop) {
                         mIsBeingDragged = true;
-                        mLastMotionX = x - mInitialMotionX > 0 ? mInitialMotionX + mTouchSlop :
-                                mInitialMotionX - mTouchSlop;
+                        mLastMotionX = x - mInitialMotionX > 0 ? mInitialMotionX + mTouchStop :
+                                mInitialMotionX - mTouchStop;
                         ViewParent parent = getParent();
                         if (parent != null) {
                             parent.requestDisallowInterceptTouchEvent(true);
@@ -233,7 +234,7 @@ public class PowSwitch extends View {
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchSlop) {
+                if (!mIsBeingDragged && Math.abs(ev.getY() - mInitialMotionY) <= mTouchStop) {
                     if (mIsOpen && mInitialMotionX < getWidth() / 2) {
                         mIsOpen = false;
                         if (mOnToggleListener != null) {
@@ -298,7 +299,6 @@ public class PowSwitch extends View {
     }
 
 
-
     private void ensureTarget() {
         final int animationTarget;
 
@@ -328,6 +328,10 @@ public class PowSwitch extends View {
 
 
     //---------------------------------------------setting----------------------------------------------//
+
+    public void setTouchEnable(boolean touchable) {
+        this.mTouchEnable = touchable;
+    }
 
     // 设置开启
     public void setOpen(boolean isOpen) {

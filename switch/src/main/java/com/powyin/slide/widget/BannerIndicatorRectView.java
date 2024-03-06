@@ -45,7 +45,7 @@ public class BannerIndicatorRectView extends View {
     private Paint mRectUnSelect;
     private Paint mRectSelect;
 
-    private int mViewCount = 0;
+    private int mViewCount = 10;
     private float mDiver;
     private float mDiverSpace;
     private float mDiverContent;
